@@ -30,21 +30,17 @@ export const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+                className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors whitespace-nowrap"
               >
                 {item.name}
               </Link>
             ))}
-          </div>
-
-          {/* Desktop Donate Button */}
-          <div className="hidden md:flex">
-            <Button asChild variant="default" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+            <Button asChild variant="default" className="bg-accent hover:bg-accent/90 text-accent-foreground ml-4">
               <Link to="/donate" className="flex items-center space-x-2">
                 <Heart className="h-4 w-4" />
                 <span>Give a Gift</span>
@@ -52,9 +48,9 @@ export const Navbar = () => {
             </Button>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile & Tablet Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
+            <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle menu</span>
@@ -84,15 +80,6 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Sticky Donate Button */}
-      <div className="md:hidden fixed bottom-4 right-4 z-50">
-        <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg">
-          <Link to="/donate" className="flex items-center space-x-2">
-            <Heart className="h-5 w-5" />
-            <span>Give</span>
-          </Link>
-        </Button>
-      </div>
     </nav>
   );
 };
