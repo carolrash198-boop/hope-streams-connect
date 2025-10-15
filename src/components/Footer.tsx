@@ -10,7 +10,7 @@ export const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-sm">DC</span>
+                <span className="text-accent-foreground font-bold text-sm">FPFK</span>
               </div>
               <span className="font-heading text-lg font-bold">Free Pentecostal Fellowship</span>
             </div>
