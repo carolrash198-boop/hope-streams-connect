@@ -40,7 +40,7 @@ export const HeroSection = () => {
               </Link>
             </Button>
             
-            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-3">
+            <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60 text-lg px-8 py-3">
               <Link to="/bible-studies" className="flex items-center space-x-2">
                 <Play className="h-5 w-5" />
                 <span>Watch Live</span>
