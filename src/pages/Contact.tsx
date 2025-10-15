@@ -158,7 +158,7 @@ const Contact = () => {
               <Button asChild size="lg" variant="secondary">
                 <a href="#contact-form">Send a Message</a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+              <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60">
                 <a href="tel:+1234567890">Call (123) 456-7890</a>
               </Button>
             </div>

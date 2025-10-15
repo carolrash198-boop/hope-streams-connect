@@ -202,7 +202,7 @@ const Gallery = () => {
               <Button asChild size="lg" variant="secondary">
                 <a href="#featured">View Featured</a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-church-green">
+              <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60">
                 <a href="#all-photos">Browse All Photos</a>
               </Button>
             </div>
