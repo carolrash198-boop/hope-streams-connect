@@ -99,9 +99,9 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email Us",
-      details: ["info@deliverancechurch.org", "pastor@deliverancechurch.org"],
+      details: ["info@fpfchurch.or.ke", "pastor@fpfchurch.or.ke"],
       action: "Send Email",
-      link: "mailto:info@deliverancechurch.org"
+      link: "mailto:info@fpfchurch.or.ke"
     }
   ];
 
@@ -123,21 +123,21 @@ const Contact = () => {
     {
       name: "Pastor Michael Johnson",
       role: "Senior Pastor",
-      email: "pastor@deliverancechurch.org",
+      email: "pastor@fpfchurch.or.ke",
       phone: "(123) 456-7892",
       specialties: ["Marriage Counseling", "Spiritual Guidance", "Leadership"]
     },
     {
       name: "Pastor Sarah Martinez",
       role: "Associate Pastor",
-      email: "sarah@deliverancechurch.org", 
+      email: "sarah@fpfchurch.or.ke", 
       phone: "(123) 456-7893",
       specialties: ["Women's Ministry", "Family Counseling", "Prayer Ministry"]
     },
     {
       name: "Pastor Mark Thompson",
       role: "Youth Pastor",
-      email: "mark@deliverancechurch.org",
+      email: "mark@fpfchurch.or.ke",
       phone: "(123) 456-7894",
       specialties: ["Youth Ministry", "Young Adults", "Discipleship"]
     }

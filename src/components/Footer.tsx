@@ -12,7 +12,7 @@ export const Footer = () => {
               <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center">
                 <span className="text-accent-foreground font-bold text-sm">DC</span>
               </div>
-              <span className="font-heading text-lg font-bold">Deliverance Church</span>
+              <span className="font-heading text-lg font-bold">Free Pentecostal Fellowship</span>
             </div>
             <p className="text-primary-foreground/80 text-sm leading-relaxed">
               Hope. Freedom. Community. We gather to worship, heal, and serve together in Christ's love.
@@ -66,8 +66,8 @@ export const Footer = () => {
               <div className="flex items-start space-x-2">
                 <MapPin className="h-4 w-4 mt-1 text-accent" />
                 <div className="text-sm">
-                  <p className="text-primary-foreground/80">123 Faith Street</p>
-                  <p className="text-primary-foreground/80">Hope City, HC 12345</p>
+                  <p className="text-primary-foreground/80">Baringo County</p>
+                  <p className="text-primary-foreground/80">Kenya</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
@@ -78,8 +78,8 @@ export const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-accent" />
-                <a href="mailto:info@deliverancechurch.org" className="text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  info@deliverancechurch.org
+                <a href="mailto:info@fpfchurch.or.ke" className="text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                  info@fpfchurch.or.ke
                 </a>
               </div>
             </div>
@@ -89,7 +89,7 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-primary-foreground/80">
-            © 2025 Deliverance Church. All rights reserved.
+            © 2025 Free Pentecostal Fellowship Church of Kenya. All rights reserved.
           </p>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
             <Link to="/privacy" className="text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">

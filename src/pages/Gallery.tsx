@@ -196,7 +196,7 @@ const Gallery = () => {
             <h1 className="mb-6">Photo Gallery</h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
               Celebrating God's faithfulness through captured moments of worship, fellowship, 
-              service, and community life at Deliverance Church.
+              service, and community life at Free Pentecostal Fellowship Church of Kenya.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" variant="secondary">

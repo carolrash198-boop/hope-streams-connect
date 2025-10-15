@@ -144,7 +144,7 @@ const Donate = () => {
                             {isRecurring ? " per month" : " one-time"}
                           </p>
                           <p className="text-sm text-muted-foreground mt-1">
-                            Supporting Deliverance Church General Fund
+                            Supporting Free Pentecostal Fellowship General Fund
                           </p>
                         </div>
                       )}

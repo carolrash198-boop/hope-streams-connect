@@ -26,7 +26,7 @@ export const Navbar = () => {
             <div className="h-8 w-8 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
               <span className="text-white font-bold text-sm">DC</span>
             </div>
-            <span className="font-heading text-xl font-bold">Deliverance Church</span>
+            <span className="font-heading text-xl font-bold">Free Pentecostal Fellowship</span>
           </Link>
 
           {/* Desktop Navigation */}

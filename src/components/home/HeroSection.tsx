@@ -18,7 +18,7 @@ export const HeroSection = () => {
         <div className="max-w-4xl mx-auto">
           {/* Main Heading */}
           <h1 className="text-white mb-6 text-5xl md:text-7xl font-bold leading-tight">
-            Deliverance Church
+            Free Pentecostal Fellowship Church of Kenya
           </h1>
           
           {/* Tagline */}
@@ -60,7 +60,7 @@ export const HeroSection = () => {
             <h3 className="text-white font-heading text-lg font-semibold mb-2">Next Service</h3>
             <p className="text-white/90 text-sm mb-1">Sunday Worship</p>
             <p className="text-accent font-semibold">This Sunday at 9:00 AM</p>
-            <p className="text-white/80 text-sm mt-2">Main Sanctuary • 123 Faith Street</p>
+            <p className="text-white/80 text-sm mt-2">Main Sanctuary • Baringo County, Kenya</p>
           </div>
         </div>
       </div>

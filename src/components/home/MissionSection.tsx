@@ -25,7 +25,7 @@ export const MissionSection = () => {
         <div className="max-w-4xl mx-auto text-center mb-16">
           <h2 className="mb-6">Our Mission</h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Deliverance Church exists to create a welcoming community where people can experience 
+            Free Pentecostal Fellowship Church of Kenya exists to create a welcoming community where people can experience 
             God's love, find freedom in Christ, and grow in their faith journey together.
           </p>
         </div>
