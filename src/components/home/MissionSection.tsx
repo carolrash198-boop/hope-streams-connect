@@ -1,21 +1,21 @@
-import { Heart, Users, BookOpen } from "lucide-react";
+import { Heart, Users, BookOpen, Church, HandHeart, Baby } from "lucide-react";
 
 export const MissionSection = () => {
   const values = [
     {
-      icon: Heart,
-      title: "Love & Compassion",
-      description: "We show Christ's love through acts of kindness and service to our community."
-    },
-    {
-      icon: Users,
-      title: "Fellowship & Unity",
-      description: "Building meaningful relationships and supporting one another in faith and life."
+      icon: Church,
+      title: "Reaching Out",
+      description: "We reach out to souls, plant churches, and make disciples in communities near and far."
     },
     {
       icon: BookOpen,
-      title: "Biblical Teaching",
-      description: "Grounded in Scripture, we learn and grow together in God's truth and wisdom."
+      title: "Discipleship",
+      description: "Through conferences and teaching, we produce Christ-like men and women rooted in God's word."
+    },
+    {
+      icon: HandHeart,
+      title: "Holistic Care",
+      description: "We touch lives holistically through mercy ministry, feeding programs, and community support."
     }
   ];
 
@@ -23,10 +23,10 @@ export const MissionSection = () => {
     <section className="py-20 bg-church-warm">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="mb-6">Our Mission</h2>
+          <h2 className="mb-6">Our Vision</h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Free Pentecostal Fellowship Church of Kenya exists to create a welcoming community where people can experience 
-            God's love, find freedom in Christ, and grow in their faith journey together.
+            Knowing Jesus and making Him known through reaching out and making disciples, 
+            touching people's lives holistically.
           </p>
         </div>
 

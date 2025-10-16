@@ -66,8 +66,8 @@ export const DonationCTA = () => {
           <div className="text-center mb-16">
             <h2 className="mb-6">Support Our Mission</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Your generous giving helps us serve our community, support families in need, 
-              and spread God's love throughout our city.
+              Your generous giving helps us reach souls, plant churches, make disciples, 
+              feed the poor and needy, and provide meals for our children every Sunday.
             </p>
           </div>
 
