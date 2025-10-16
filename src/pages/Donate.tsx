@@ -61,7 +61,7 @@ const Donate = () => {
               <Button asChild size="lg" variant="secondary">
                 <a href="#donate-now">Give Now</a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-accent">
+              <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60">
                 <a href="#campaigns">View Campaigns</a>
               </Button>
             </div>
