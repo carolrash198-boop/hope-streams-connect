@@ -110,6 +110,60 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_submissions: {
+        Row: {
+          created_at: string | null
+          email: string
+          first_name: string
+          follow_up_notes: string | null
+          id: string
+          inquiry_type: string | null
+          is_urgent: boolean | null
+          last_name: string
+          message: string
+          phone: string | null
+          preferred_contact: string | null
+          status: string | null
+          subject: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          first_name: string
+          follow_up_notes?: string | null
+          id?: string
+          inquiry_type?: string | null
+          is_urgent?: boolean | null
+          last_name: string
+          message: string
+          phone?: string | null
+          preferred_contact?: string | null
+          status?: string | null
+          subject: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          follow_up_notes?: string | null
+          id?: string
+          inquiry_type?: string | null
+          is_urgent?: boolean | null
+          last_name?: string
+          message?: string
+          phone?: string | null
+          preferred_contact?: string | null
+          status?: string | null
+          subject?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       donations: {
         Row: {
           amount: number
@@ -489,14 +543,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
       event_status: "draft" | "published" | "cancelled"
       prayer_status: "pending" | "public" | "confidential" | "follow_up_needed"
       sermon_format: "audio" | "video" | "both"
@@ -633,6 +715,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
       event_status: ["draft", "published", "cancelled"],
       prayer_status: ["pending", "public", "confidential", "follow_up_needed"],
       sermon_format: ["audio", "video", "both"],
