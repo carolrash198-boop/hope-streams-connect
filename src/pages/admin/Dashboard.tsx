@@ -5,10 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
-  ShoppingCart,
-  TrendingUp,
   DollarSign,
-  Eye,
   Users,
   LogOut,
   Mail,
@@ -17,6 +14,7 @@ import {
   Image,
   Heart,
   MessageSquare,
+  BookOpen,
 } from "lucide-react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import StatsCard from "@/components/admin/StatsCard";
@@ -146,26 +144,81 @@ const Dashboard = () => {
               <CardDescription>Manage your church content</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <Button variant="outline" className="justify-start">
+              <Button 
+                variant="outline" 
+                className="justify-start"
+                onClick={() => navigate("/admin/contact")}
+              >
                 <Mail className="mr-2 h-4 w-4" />
                 View Contact Submissions
               </Button>
-              <Button variant="outline" className="justify-start">
-                <Calendar className="mr-2 h-4 w-4" />
-                Manage Events
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <FileText className="mr-2 h-4 w-4" />
-                Manage Sermons
-              </Button>
-              <Button variant="outline" className="justify-start">
+              <Button 
+                variant="outline" 
+                className="justify-start"
+                onClick={() => navigate("/admin/gallery")}
+              >
                 <Image className="mr-2 h-4 w-4" />
                 Update Gallery
+              </Button>
+              <Button 
+                variant="outline" 
+                className="justify-start"
+                onClick={() => navigate("/admin/prayers")}
+              >
+                <Heart className="mr-2 h-4 w-4" />
+                Prayer Requests
+              </Button>
+              <Button 
+                variant="outline" 
+                className="justify-start"
+                onClick={() => navigate("/admin/donations")}
+              >
+                <DollarSign className="mr-2 h-4 w-4" />
+                Manage Donations
               </Button>
             </CardContent>
           </Card>
 
-          <RecentSignups />
+          <Card>
+            <CardHeader>
+              <CardTitle>Content Management</CardTitle>
+              <CardDescription>Update website content</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <Button 
+                variant="outline" 
+                className="justify-start"
+                onClick={() => navigate("/admin/blog")}
+              >
+                <BookOpen className="mr-2 h-4 w-4" />
+                Blog Posts
+              </Button>
+              <Button 
+                variant="outline" 
+                className="justify-start"
+                onClick={() => navigate("/admin/users")}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Manage Users
+              </Button>
+              <Button 
+                variant="outline" 
+                className="justify-start"
+                onClick={() => navigate("/admin/events")}
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                Manage Events
+              </Button>
+              <Button 
+                variant="outline" 
+                className="justify-start"
+                onClick={() => navigate("/admin/sermons")}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Manage Sermons
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
