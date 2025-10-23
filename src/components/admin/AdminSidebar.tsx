@@ -1,19 +1,21 @@
-import { Home, Calendar, Mail, FileText, Image, Users, Settings } from "lucide-react";
+import { Home, Calendar, Mail, FileText, Image, Users, Heart, DollarSign, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
-  { name: "Dashboard", icon: Home, current: true },
-  { name: "Events", icon: Calendar, current: false },
-  { name: "Contact", icon: Mail, current: false },
-  { name: "Sermons", icon: FileText, current: false },
-  { name: "Gallery", icon: Image, current: false },
-  { name: "Users", icon: Users, current: false },
-  { name: "Settings", icon: Settings, current: false },
+  { name: "Dashboard", icon: Home, path: "/admin/dashboard" },
+  { name: "Events", icon: Calendar, path: "/admin/events" },
+  { name: "Sermons", icon: FileText, path: "/admin/sermons" },
+  { name: "Contact", icon: Mail, path: "/admin/contact" },
+  { name: "Gallery", icon: Image, path: "/admin/gallery" },
+  { name: "Prayer Requests", icon: Heart, path: "/admin/prayers" },
+  { name: "Donations", icon: DollarSign, path: "/admin/donations" },
+  { name: "Blog Posts", icon: BookOpen, path: "/admin/blog" },
+  { name: "Users", icon: Users, path: "/admin/users" },
 ];
 
 const AdminSidebar = () => {
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const location = useLocation();
 
   return (
     <div className="w-64 bg-card border-r">
@@ -23,11 +25,11 @@ const AdminSidebar = () => {
       <nav className="space-y-1 p-4">
         {navigation.map((item) => {
           const Icon = item.icon;
-          const isActive = activeItem === item.name;
+          const isActive = location.pathname === item.path;
           return (
-            <button
+            <Link
               key={item.name}
-              onClick={() => setActiveItem(item.name)}
+              to={item.path}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
                 isActive
@@ -37,7 +39,7 @@ const AdminSidebar = () => {
             >
               <Icon className="h-5 w-5" />
               {item.name}
-            </button>
+            </Link>
           );
         })}
       </nav>

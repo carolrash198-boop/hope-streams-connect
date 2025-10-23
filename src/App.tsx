@@ -14,6 +14,14 @@ import Donate from "./pages/Donate";
 import NotFound from "./pages/NotFound";
 import AdminAuth from "./pages/admin/Auth";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminEvents from "./pages/admin/Events";
+import AdminSermons from "./pages/admin/Sermons";
+import AdminContact from "./pages/admin/Contact";
+import AdminGallery from "./pages/admin/Gallery";
+import AdminPrayers from "./pages/admin/Prayers";
+import AdminDonations from "./pages/admin/Donations";
+import AdminBlog from "./pages/admin/Blog";
+import AdminUsers from "./pages/admin/Users";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +42,14 @@ const App = () => (
           <Route path="/donate" element={<Donate />} />
           <Route path="/admin/auth" element={<AdminAuth />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/events" element={<AdminEvents />} />
+          <Route path="/admin/sermons" element={<AdminSermons />} />
+          <Route path="/admin/contact" element={<AdminContact />} />
+          <Route path="/admin/gallery" element={<AdminGallery />} />
+          <Route path="/admin/prayers" element={<AdminPrayers />} />
+          <Route path="/admin/donations" element={<AdminDonations />} />
+          <Route path="/admin/blog" element={<AdminBlog />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
