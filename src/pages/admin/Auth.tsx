@@ -17,13 +17,10 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isSignup, setIsSignup] = useState(false);
-  const [hasAdmins, setHasAdmins] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     checkSession();
-    checkAdminExists();
   }, []);
 
   const checkSession = async () => {
@@ -31,16 +28,6 @@ const Auth = () => {
     if (session) {
       navigate("/admin/dashboard");
     }
-  };
-
-  const checkAdminExists = async () => {
-    const { count } = await supabase
-      .from("user_roles")
-      .select("*", { count: "exact", head: true })
-      .eq("role", "admin");
-    
-    setHasAdmins((count ?? 0) > 0);
-    setIsSignup((count ?? 0) === 0);
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -55,48 +42,24 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isSignup) {
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/admin/dashboard`,
-          },
-        });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) throw error;
 
-        if (signUpError) throw signUpError;
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+        .eq("role", "admin")
+        .single();
 
-        if (signUpData.user) {
-          const { error: roleError } = await supabase
-            .from("user_roles")
-            .insert({ user_id: signUpData.user.id, role: "admin" });
-
-          if (roleError) throw roleError;
-
-          toast.success("Admin account created! Please check your email to verify.");
-          setIsSignup(false);
-          setHasAdmins(true);
-        }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        
-        if (error) throw error;
-
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
-          .eq("role", "admin")
-          .single();
-
-        if (!roleData) {
-          await supabase.auth.signOut();
-          throw new Error("Unauthorized: Admin access only");
-        }
-
-        toast.success("Logged in successfully!");
-        navigate("/admin/dashboard");
+      if (!roleData) {
+        await supabase.auth.signOut();
+        throw new Error("Unauthorized: Admin access only");
       }
+
+      toast.success("Logged in successfully!");
+      navigate("/admin/dashboard");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -108,11 +71,9 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/10 to-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Admin {isSignup ? "Setup" : "Login"}</CardTitle>
+          <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>
-            {isSignup 
-              ? "Create the first admin account" 
-              : "Sign in to access the dashboard"}
+            Sign in to access the dashboard
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -140,7 +101,7 @@ const Auth = () => {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Please wait..." : isSignup ? "Create Admin Account" : "Sign In"}
+              {loading ? "Please wait..." : "Sign In"}
             </Button>
           </form>
         </CardContent>
