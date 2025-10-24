@@ -134,19 +134,36 @@ const Gallery = () => {
   ];
 
   useEffect(() => {
-    // Simulate loading and use sample data
-    setTimeout(() => {
-      setGalleryItems(sampleGallery);
-      
-      // Extract unique values for filters
-      const albums = [...new Set(sampleGallery.map(item => item.album).filter(Boolean) as string[])];
-      const tags = [...new Set(sampleGallery.flatMap(item => item.tags))];
-      
-      setAllAlbums(albums);
-      setAllTags(tags);
-      setLoading(false);
-    }, 1000);
+    fetchGalleryItems();
   }, []);
+
+  const fetchGalleryItems = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("gallery_items")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching gallery:", error);
+      // Fallback to sample data on error
+      setGalleryItems(sampleGallery);
+    } else if (data && data.length > 0) {
+      setGalleryItems(data as GalleryItem[]);
+    } else {
+      // Use sample data if database is empty
+      setGalleryItems(sampleGallery);
+    }
+
+    // Extract unique values for filters
+    const items = data && data.length > 0 ? data : sampleGallery;
+    const albums = [...new Set(items.map(item => item.album).filter(Boolean) as string[])];
+    const tags = [...new Set(items.flatMap(item => item.tags || []))];
+    
+    setAllAlbums(albums);
+    setAllTags(tags);
+    setLoading(false);
+  };
 
   const filteredItems = galleryItems.filter(item => {
     const matchesSearch = searchTerm === "" || 

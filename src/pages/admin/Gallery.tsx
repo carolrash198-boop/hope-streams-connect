@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Upload, Link as LinkIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Gallery = () => {
   const [items, setItems] = useState<any[]>([]);
@@ -23,6 +24,8 @@ const Gallery = () => {
     event_date: "",
     is_featured: false,
   });
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadMethod, setUploadMethod] = useState<"file" | "url">("file");
 
   useEffect(() => {
     fetchItems();
@@ -46,10 +49,33 @@ const Gallery = () => {
     setLoading(true);
 
     try {
+      let imageUrl = formData.image_url;
+
+      // Handle file upload
+      if (uploadMethod === "file" && uploadFile && !editingItem) {
+        const fileExt = uploadFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('gallery-images')
+          .upload(filePath, uploadFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('gallery-images')
+          .getPublicUrl(filePath);
+
+        imageUrl = publicUrl;
+      }
+
+      const dataToSave = { ...formData, image_url: imageUrl };
+
       if (editingItem) {
         const { error } = await supabase
           .from("gallery_items")
-          .update(formData)
+          .update(dataToSave)
           .eq("id", editingItem.id);
 
         if (error) throw error;
@@ -57,7 +83,7 @@ const Gallery = () => {
       } else {
         const { error } = await supabase
           .from("gallery_items")
-          .insert([formData]);
+          .insert([dataToSave]);
 
         if (error) throw error;
         toast.success("Gallery item created successfully");
@@ -99,6 +125,8 @@ const Gallery = () => {
       is_featured: false,
     });
     setEditingItem(null);
+    setUploadFile(null);
+    setUploadMethod("file");
   };
 
   const handleEdit = (item: any) => {
@@ -144,15 +172,57 @@ const Gallery = () => {
                     required
                   />
                 </div>
-                <div>
-                  <Label htmlFor="image_url">Image URL</Label>
-                  <Input
-                    id="image_url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    required
-                  />
-                </div>
+
+                {!editingItem && (
+                  <div>
+                    <Label>Upload Method</Label>
+                    <Tabs value={uploadMethod} onValueChange={(v) => setUploadMethod(v as "file" | "url")}>
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="file">
+                          <Upload className="mr-2 h-4 w-4" />
+                          Upload File
+                        </TabsTrigger>
+                        <TabsTrigger value="url">
+                          <LinkIcon className="mr-2 h-4 w-4" />
+                          Image URL
+                        </TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="file" className="mt-4">
+                        <Label htmlFor="file">Select Image</Label>
+                        <Input
+                          id="file"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                          required
+                        />
+                      </TabsContent>
+                      <TabsContent value="url" className="mt-4">
+                        <Label htmlFor="image_url">Image URL</Label>
+                        <Input
+                          id="image_url"
+                          placeholder="https://example.com/image.jpg"
+                          value={formData.image_url}
+                          onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                          required
+                        />
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                )}
+
+                {editingItem && (
+                  <div>
+                    <Label htmlFor="image_url">Image URL</Label>
+                    <Input
+                      id="image_url"
+                      value={formData.image_url}
+                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                      required
+                    />
+                  </div>
+                )}
+
                 <div>
                   <Label htmlFor="description">Description</Label>
                   <Textarea
