@@ -76,13 +76,13 @@ const BibleStudies = () => {
       const matchesSearch = searchTerm === "" || 
         sermon.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sermon.preacher.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sermon.scripture_passages.some(passage => 
+        (sermon.scripture_passages && sermon.scripture_passages.some(passage => 
           passage.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        ));
 
       const matchesSeries = filterSeries === "all" || sermon.series === filterSeries;
       const matchesPreacher = filterPreacher === "all" || sermon.preacher === filterPreacher;
-      const matchesTag = filterTag === "all" || sermon.tags.includes(filterTag);
+      const matchesTag = filterTag === "all" || (sermon.tags && sermon.tags.includes(filterTag));
 
       return matchesSearch && matchesSeries && matchesPreacher && matchesTag;
     })
@@ -297,7 +297,7 @@ const BibleStudies = () => {
                           <Calendar className="h-4 w-4" />
                           <span>{formatDate(sermon.date)}</span>
                         </div>
-                        {sermon.scripture_passages.length > 0 && (
+                        {sermon.scripture_passages && sermon.scripture_passages.length > 0 && (
                           <div className="flex items-center space-x-2">
                             <BookOpen className="h-4 w-4" />
                             <span className="line-clamp-1">
@@ -312,7 +312,7 @@ const BibleStudies = () => {
                       </div>
 
                       {/* Tags */}
-                      {sermon.tags.length > 0 && (
+                      {sermon.tags && sermon.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-4">
                           {sermon.tags.slice(0, 3).map((tag, index) => (
                             <Badge key={index} variant="secondary" className="text-xs">
