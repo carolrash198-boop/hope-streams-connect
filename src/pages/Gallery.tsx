@@ -171,7 +171,7 @@ const Gallery = () => {
       (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesAlbum = filterAlbum === "all" || item.album === filterAlbum;
-    const matchesTag = filterTag === "all" || item.tags.includes(filterTag);
+    const matchesTag = filterTag === "all" || (item.tags && item.tags.includes(filterTag));
 
     return matchesSearch && matchesAlbum && matchesTag;
   });
