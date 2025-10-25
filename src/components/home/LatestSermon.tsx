@@ -130,7 +130,7 @@ export const LatestSermon = () => {
                       <Calendar className="h-4 w-4" />
                       <span>{formattedDate}</span>
                     </div>
-                    {sermon.scripture_passages.length > 0 && (
+                    {sermon.scripture_passages && sermon.scripture_passages.length > 0 && (
                       <div className="flex items-center space-x-2">
                         <BookOpen className="h-4 w-4" />
                         <span>{sermon.scripture_passages[0]}</span>
@@ -139,7 +139,7 @@ export const LatestSermon = () => {
                   </div>
 
                   {/* Tags */}
-                  {sermon.tags.length > 0 && (
+                  {sermon.tags && sermon.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-6">
                       {sermon.tags.map((tag, index) => (
                         <span
