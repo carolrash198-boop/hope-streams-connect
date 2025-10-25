@@ -432,7 +432,7 @@ const Gallery = () => {
                         )}
                       </div>
                       
-                      {item.tags.length > 0 && (
+                      {item.tags && item.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-3">
                           {item.tags.slice(0, 3).map((tag, index) => {
                             const IconComponent = getTagIcon(tag);
@@ -493,7 +493,7 @@ const Gallery = () => {
                   )}
                 </div>
 
-                {selectedImage.tags.length > 0 && (
+                {selectedImage.tags && selectedImage.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {selectedImage.tags.map((tag, index) => (
                       <Badge key={index} variant="outline">
