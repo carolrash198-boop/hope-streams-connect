@@ -110,6 +110,62 @@ export type Database = {
         }
         Relationships: []
       }
+      class_visits: {
+        Row: {
+          child_age: number | null
+          child_name: string
+          class_id: string
+          created_at: string | null
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          message: string | null
+          phone: string | null
+          status: string | null
+          user_id: string | null
+          visit_date: string | null
+        }
+        Insert: {
+          child_age?: number | null
+          child_name: string
+          class_id: string
+          created_at?: string | null
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          message?: string | null
+          phone?: string | null
+          status?: string | null
+          user_id?: string | null
+          visit_date?: string | null
+        }
+        Update: {
+          child_age?: number | null
+          child_name?: string
+          class_id?: string
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          message?: string | null
+          phone?: string | null
+          status?: string | null
+          user_id?: string | null
+          visit_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_visits_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "sunday_school_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_submissions: {
         Row: {
           created_at: string | null
@@ -540,6 +596,60 @@ export type Database = {
           transcript?: string | null
           updated_at?: string | null
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      sunday_school_classes: {
+        Row: {
+          age_range: string
+          created_at: string | null
+          created_by: string | null
+          current_enrollment: number | null
+          curriculum: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          location: string | null
+          max_capacity: number | null
+          name: string
+          teacher_name: string | null
+          time_end: string
+          time_start: string
+          updated_at: string | null
+        }
+        Insert: {
+          age_range: string
+          created_at?: string | null
+          created_by?: string | null
+          current_enrollment?: number | null
+          curriculum?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          max_capacity?: number | null
+          name: string
+          teacher_name?: string | null
+          time_end: string
+          time_start: string
+          updated_at?: string | null
+        }
+        Update: {
+          age_range?: string
+          created_at?: string | null
+          created_by?: string | null
+          current_enrollment?: number | null
+          curriculum?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          max_capacity?: number | null
+          name?: string
+          teacher_name?: string | null
+          time_end?: string
+          time_start?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
