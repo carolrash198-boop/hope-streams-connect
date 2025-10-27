@@ -23,6 +23,7 @@ import AdminDonations from "./pages/admin/Donations";
 import AdminBlog from "./pages/admin/Blog";
 import AdminUsers from "./pages/admin/Users";
 import AdminSundaySchool from "./pages/admin/SundaySchool";
+import AdminClassVisits from "./pages/admin/ClassVisits";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/admin/blog" element={<AdminBlog />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/sunday-school" element={<AdminSundaySchool />} />
+          <Route path="/admin/class-visits" element={<AdminClassVisits />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
