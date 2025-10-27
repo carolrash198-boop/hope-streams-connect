@@ -44,9 +44,22 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // In a real implementation, you would send this to your contact endpoint
-      // For now, we'll simulate the submission
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert({
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone: formData.phone || null,
+          subject: formData.subject,
+          message: formData.message,
+          inquiry_type: formData.inquiryType || null,
+          preferred_contact: formData.preferredContact,
+          is_urgent: formData.isUrgent,
+          status: 'pending'
+        });
+
+      if (error) throw error;
 
       toast({
         title: "Message Sent!",
@@ -67,6 +80,7 @@ const Contact = () => {
       });
 
     } catch (error) {
+      console.error('Error submitting contact form:', error);
       toast({
         title: "Error",
         description: "There was a problem sending your message. Please try again.",
