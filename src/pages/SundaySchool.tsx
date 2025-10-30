@@ -103,6 +103,31 @@ const SundaySchool = () => {
     if (name.toLowerCase().includes("young adult") || name.toLowerCase().includes("18-30")) return GraduationCap;
     return Star;
   };
+
+  const [teachers, setTeachers] = useState<any[]>([]);
+  const [curriculumItems, setCurriculumItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const fetchContent = async () => {
+    try {
+      const [teachersRes, curriculumRes] = await Promise.all([
+        supabase.from("sunday_school_teachers").select("*").eq("is_active", true).order("display_order"),
+        supabase.from("curriculum_items").select("*").eq("is_active", true).order("display_order")
+      ]);
+
+      if (teachersRes.error) throw teachersRes.error;
+      if (curriculumRes.error) throw curriculumRes.error;
+
+      setTeachers(teachersRes.data || []);
+      setCurriculumItems(curriculumRes.data || []);
+    } catch (error) {
+      console.error("Error fetching content:", error);
+    }
+  };
+
   const ageGroups = [
     {
       title: "Little Lambs (Ages 2-4)",
@@ -172,63 +197,6 @@ const SundaySchool = () => {
     }
   ];
 
-  const teachers = [
-    {
-      name: "Sarah Johnson",
-      role: "Children's Ministry Director",
-      experience: "8 years",
-      background: "Elementary Education, Child Development",
-      bio: "Sarah has been working with children for over a decade and loves helping little ones discover God's love through creative activities and storytelling."
-    },
-    {
-      name: "Mike & Lisa Chen", 
-      role: "Elementary Coordinators",
-      experience: "5 years",
-      background: "Youth Ministry, Elementary Education",
-      bio: "This dynamic couple brings energy and creativity to children's ministry, making Bible lessons come alive through interactive teaching methods."
-    },
-    {
-      name: "David Thompson",
-      role: "Pre-Teen Ministry Leader", 
-      experience: "10 years",
-      background: "Youth Pastor, Biblical Studies",
-      bio: "David specializes in helping pre-teens navigate the transition to teenage years while building a strong foundation of faith and character."
-    },
-    {
-      name: "Pastor Mark & Jennifer",
-      role: "Youth Pastors",
-      experience: "12 years", 
-      background: "Youth Ministry, Family Counseling",
-      bio: "Mark and Jennifer are passionate about helping teenagers discover their identity in Christ and prepare for their future calling."
-    }
-  ];
-
-  const curriculumOverview = [
-    {
-      quarter: "Winter (Jan-Mar)",
-      theme: "Foundations of Faith",
-      focus: "Core beliefs, prayer, Bible study habits",
-      keyVerses: ["John 3:16", "Romans 3:23", "Ephesians 2:8-9"]
-    },
-    {
-      quarter: "Spring (Apr-Jun)", 
-      theme: "Living Like Jesus",
-      focus: "Character development, fruit of the Spirit, service",
-      keyVerses: ["Galatians 5:22-23", "1 John 4:19", "Matthew 22:37-39"]
-    },
-    {
-      quarter: "Summer (Jul-Sep)",
-      theme: "Bible Heroes & Adventures", 
-      focus: "Old Testament stories, courage, obedience",
-      keyVerses: ["Joshua 1:9", "Proverbs 3:5-6", "Jeremiah 29:11"]
-    },
-    {
-      quarter: "Fall (Oct-Dec)",
-      theme: "God's Great Plan",
-      focus: "Jesus' birth, salvation story, sharing faith",
-      keyVerses: ["Luke 2:11", "Romans 10:9", "Matthew 28:19-20"]
-    }
-  ];
 
   return (
     <Layout>
@@ -473,24 +441,26 @@ const SundaySchool = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {curriculumOverview.map((quarter, index) => (
-                <Card key={index}>
+              {curriculumItems.map((quarter) => (
+                <Card key={quarter.id}>
                   <CardHeader>
                     <CardTitle className="text-accent">{quarter.quarter}</CardTitle>
                     <h3 className="text-lg font-semibold">{quarter.theme}</h3>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <p className="text-sm text-muted-foreground">{quarter.focus}</p>
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">Key Verses:</h4>
-                      <div className="space-y-1">
-                        {quarter.keyVerses.map((verse, vIndex) => (
-                          <Badge key={vIndex} variant="outline" className="text-xs">
-                            {verse}
-                          </Badge>
-                        ))}
+                    {quarter.key_verses && quarter.key_verses.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Key Verses:</h4>
+                        <div className="space-y-1">
+                          {quarter.key_verses.map((verse: string, vIndex: number) => (
+                            <Badge key={vIndex} variant="outline" className="text-xs">
+                              {verse}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -509,8 +479,8 @@ const SundaySchool = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {teachers.map((teacher, index) => (
-                <Card key={index}>
+              {teachers.map((teacher) => (
+                <Card key={teacher.id}>
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
                       <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
@@ -519,13 +489,17 @@ const SundaySchool = () => {
                       <div className="flex-1">
                         <h3 className="font-semibold mb-1">{teacher.name}</h3>
                         <p className="text-accent text-sm font-medium mb-2">{teacher.role}</p>
-                        <div className="text-xs text-muted-foreground mb-3 space-y-1">
-                          <p><span className="font-medium">Experience:</span> {teacher.experience}</p>
-                          <p><span className="font-medium">Background:</span> {teacher.background}</p>
-                        </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {teacher.bio}
-                        </p>
+                        {(teacher.experience || teacher.background) && (
+                          <div className="text-xs text-muted-foreground mb-3 space-y-1">
+                            {teacher.experience && <p><span className="font-medium">Experience:</span> {teacher.experience}</p>}
+                            {teacher.background && <p><span className="font-medium">Background:</span> {teacher.background}</p>}
+                          </div>
+                        )}
+                        {teacher.bio && (
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {teacher.bio}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </CardContent>

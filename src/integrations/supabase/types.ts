@@ -220,6 +220,45 @@ export type Database = {
         }
         Relationships: []
       }
+      curriculum_items: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          display_order: number | null
+          focus: string
+          id: string
+          is_active: boolean | null
+          key_verses: string[] | null
+          quarter: string
+          theme: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          display_order?: number | null
+          focus: string
+          id?: string
+          is_active?: boolean | null
+          key_verses?: string[] | null
+          quarter: string
+          theme: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          display_order?: number | null
+          focus?: string
+          id?: string
+          is_active?: boolean | null
+          key_verses?: string[] | null
+          quarter?: string
+          theme?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       donations: {
         Row: {
           amount: number
@@ -437,6 +476,45 @@ export type Database = {
         }
         Relationships: []
       }
+      kids_programs: {
+        Row: {
+          age_group: string
+          ages: string
+          created_at: string
+          created_by: string | null
+          description: string
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          service_time: string
+          updated_at: string
+        }
+        Insert: {
+          age_group: string
+          ages: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          service_time: string
+          updated_at?: string
+        }
+        Update: {
+          age_group?: string
+          ages?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          service_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       prayer_requests: {
         Row: {
           created_at: string | null
@@ -599,6 +677,90 @@ export type Database = {
         }
         Relationships: []
       }
+      service_features: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          display_order: number | null
+          icon_name: string
+          id: string
+          is_active: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          display_order?: number | null
+          icon_name: string
+          id?: string
+          is_active?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          display_order?: number | null
+          icon_name?: string
+          id?: string
+          is_active?: boolean | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      service_schedules: {
+        Row: {
+          audience: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          display_order: number | null
+          duration: string | null
+          id: string
+          is_active: boolean | null
+          location: string | null
+          style: string | null
+          time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          duration?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          style?: string | null
+          time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          duration?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          style?: string | null
+          time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sunday_school_classes: {
         Row: {
           age_range: string
@@ -650,6 +812,51 @@ export type Database = {
           time_end?: string
           time_start?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sunday_school_teachers: {
+        Row: {
+          background: string | null
+          bio: string | null
+          created_at: string
+          created_by: string | null
+          display_order: number | null
+          experience: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          photo_url: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          background?: string | null
+          bio?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_order?: number | null
+          experience?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          photo_url?: string | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          background?: string | null
+          bio?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_order?: number | null
+          experience?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          photo_url?: string | null
+          role?: string
+          updated_at?: string
         }
         Relationships: []
       }

@@ -1,79 +1,49 @@
+import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Users, Heart, Calendar, Music, BookOpen, Coffee } from "lucide-react";
+import { Clock, MapPin, Users, Heart, Music, BookOpen, Coffee } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+const iconMap: Record<string, any> = {
+  Music, BookOpen, Heart, Coffee, Clock, MapPin, Users
+};
 
 const Services = () => {
-  const serviceSchedule = [
-    {
-      time: "9:00 AM",
-      title: "Morning Worship",
-      description: "Traditional service with hymns, prayer, and biblical teaching",
-      audience: "All Ages",
-      duration: "75 minutes",
-      style: "Traditional"
-    },
-    {
-      time: "11:00 AM", 
-      title: "Contemporary Worship",
-      description: "Modern worship with contemporary music and relevant teaching",
-      audience: "All Ages",
-      duration: "90 minutes",
-      style: "Contemporary"
-    }
-  ];
+  const [schedules, setSchedules] = useState<any[]>([]);
+  const [features, setFeatures] = useState<any[]>([]);
+  const [kidsPrograms, setKidsPrograms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const whatToExpect = [
-    {
-      icon: Music,
-      title: "Worship Music",
-      description: "Uplifting songs that draw hearts to God, both traditional hymns and contemporary praise"
-    },
-    {
-      icon: BookOpen,
-      title: "Biblical Teaching",
-      description: "Practical, life-changing messages rooted in Scripture and relevant to daily life"
-    },
-    {
-      icon: Heart,
-      title: "Prayer Time",
-      description: "Moments of personal and corporate prayer for healing, guidance, and thanksgiving"
-    },
-    {
-      icon: Coffee,
-      title: "Fellowship",
-      description: "Connect with others before and after service over coffee and light refreshments"
-    }
-  ];
+  useEffect(() => {
+    fetchAllData();
+  }, []);
 
-  const kidsFamilyInfo = [
-    {
-      ageGroup: "Nursery",
-      ages: "0-2 years",
-      description: "Safe, loving care with age-appropriate activities and Bible stories",
-      time: "Both Services"
-    },
-    {
-      ageGroup: "Preschool",
-      ages: "3-5 years", 
-      description: "Interactive lessons, songs, and crafts that introduce children to Jesus",
-      time: "Both Services"
-    },
-    {
-      ageGroup: "Elementary",
-      ages: "6-12 years",
-      description: "Engaging Bible lessons with games, worship, and small group discussions",
-      time: "Both Services"
-    },
-    {
-      ageGroup: "Youth",
-      ages: "13-18 years",
-      description: "Relevant teaching, worship, and community building for teenagers",
-      time: "11:00 AM Service"
+  const fetchAllData = async () => {
+    try {
+      const [schedulesRes, featuresRes, kidsRes] = await Promise.all([
+        supabase.from("service_schedules").select("*").eq("is_active", true).order("display_order"),
+        supabase.from("service_features").select("*").eq("is_active", true).order("display_order"),
+        supabase.from("kids_programs").select("*").eq("is_active", true).order("display_order")
+      ]);
+
+      if (schedulesRes.error) throw schedulesRes.error;
+      if (featuresRes.error) throw featuresRes.error;
+      if (kidsRes.error) throw kidsRes.error;
+
+      setSchedules(schedulesRes.data || []);
+      setFeatures(featuresRes.data || []);
+      setKidsPrograms(kidsRes.data || []);
+    } catch (error: any) {
+      toast.error("Failed to load service information");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   return (
     <Layout>
@@ -107,36 +77,48 @@ const Services = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {serviceSchedule.map((service, index) => (
-                <Card key={index} className="overflow-hidden">
-                  <CardHeader className="bg-accent/10">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-2xl">{service.time}</CardTitle>
-                      <Badge variant="secondary">{service.style}</Badge>
-                    </div>
-                    <h3 className="text-xl">{service.title}</h3>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <p className="text-muted-foreground mb-4">{service.description}</p>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Users className="h-4 w-4 text-accent" />
-                        <span>{service.audience}</span>
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {[1, 2].map(i => (
+                  <div key={i} className="animate-pulse h-48 bg-muted rounded-xl"></div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {schedules.map((service) => (
+                  <Card key={service.id} className="overflow-hidden">
+                    <CardHeader className="bg-accent/10">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-2xl">{service.time}</CardTitle>
+                        {service.style && <Badge variant="secondary">{service.style}</Badge>}
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4 text-accent" />
-                        <span>{service.duration}</span>
+                      <h3 className="text-xl">{service.title}</h3>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-muted-foreground mb-4">{service.description}</p>
+                      <div className="space-y-2 text-sm">
+                        {service.audience && (
+                          <div className="flex items-center space-x-2">
+                            <Users className="h-4 w-4 text-accent" />
+                            <span>{service.audience}</span>
+                          </div>
+                        )}
+                        {service.duration && (
+                          <div className="flex items-center space-x-2">
+                            <Clock className="h-4 w-4 text-accent" />
+                            <span>{service.duration}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="h-4 w-4 text-accent" />
+                          <span>{service.location || "Main Sanctuary"}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="h-4 w-4 text-accent" />
-                        <span>Main Sanctuary</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
@@ -151,10 +133,10 @@ const Services = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {whatToExpect.map((item, index) => {
-                const Icon = item.icon;
+              {features.map((item) => {
+                const Icon = iconMap[item.icon_name] || Heart;
                 return (
-                  <div key={index} className="text-center">
+                  <div key={item.id} className="text-center">
                     <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-accent/20 flex items-center justify-center">
                       <Icon className="h-8 w-8 text-accent" />
                     </div>
@@ -180,19 +162,19 @@ const Services = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {kidsFamilyInfo.map((group, index) => (
-                <Card key={index}>
+              {kidsPrograms.map((group) => (
+                <Card key={group.id}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-lg font-semibold">{group.ageGroup}</h3>
+                      <h3 className="text-lg font-semibold">{group.age_group}</h3>
                       <Badge variant="outline">{group.ages}</Badge>
                     </div>
                     <p className="text-muted-foreground mb-3 text-sm">
                       {group.description}
                     </p>
                     <div className="flex items-center space-x-2 text-sm text-accent">
-                      <Calendar className="h-4 w-4" />
-                      <span>{group.time}</span>
+                      <Clock className="h-4 w-4" />
+                      <span>{group.service_time}</span>
                     </div>
                   </CardContent>
                 </Card>

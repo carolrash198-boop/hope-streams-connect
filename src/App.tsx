@@ -24,6 +24,8 @@ import AdminBlog from "./pages/admin/Blog";
 import AdminUsers from "./pages/admin/Users";
 import AdminSundaySchool from "./pages/admin/SundaySchool";
 import AdminClassVisits from "./pages/admin/ClassVisits";
+import AdminServices from "./pages/admin/Services";
+import AdminSundaySchoolContent from "./pages/admin/SundaySchoolContent";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,7 @@ const App = () => (
           <Route path="/donate" element={<Donate />} />
           <Route path="/admin/auth" element={<AdminAuth />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/services" element={<AdminServices />} />
           <Route path="/admin/events" element={<AdminEvents />} />
           <Route path="/admin/sermons" element={<AdminSermons />} />
           <Route path="/admin/contact" element={<AdminContact />} />
@@ -53,6 +56,7 @@ const App = () => (
           <Route path="/admin/blog" element={<AdminBlog />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/sunday-school" element={<AdminSundaySchool />} />
+          <Route path="/admin/sunday-school-content" element={<AdminSundaySchoolContent />} />
           <Route path="/admin/class-visits" element={<AdminClassVisits />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
