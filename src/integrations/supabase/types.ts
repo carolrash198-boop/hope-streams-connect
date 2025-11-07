@@ -434,6 +434,78 @@ export type Database = {
         }
         Relationships: []
       }
+      footer_settings: {
+        Row: {
+          about_text: string
+          address_line1: string
+          address_line2: string
+          church_abbreviation: string
+          church_name: string
+          copyright_text: string
+          created_at: string | null
+          created_by: string | null
+          email: string
+          facebook_url: string | null
+          id: string
+          instagram_url: string | null
+          is_active: boolean | null
+          phone: string
+          quick_links: Json
+          service_times: Json
+          show_privacy_policy: boolean | null
+          show_terms_of_service: boolean | null
+          twitter_url: string | null
+          updated_at: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          about_text?: string
+          address_line1?: string
+          address_line2?: string
+          church_abbreviation?: string
+          church_name?: string
+          copyright_text?: string
+          created_at?: string | null
+          created_by?: string | null
+          email?: string
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          is_active?: boolean | null
+          phone?: string
+          quick_links?: Json
+          service_times?: Json
+          show_privacy_policy?: boolean | null
+          show_terms_of_service?: boolean | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          about_text?: string
+          address_line1?: string
+          address_line2?: string
+          church_abbreviation?: string
+          church_name?: string
+          copyright_text?: string
+          created_at?: string | null
+          created_by?: string | null
+          email?: string
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          is_active?: boolean | null
+          phone?: string
+          quick_links?: Json
+          service_times?: Json
+          show_privacy_policy?: boolean | null
+          show_terms_of_service?: boolean | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       gallery_items: {
         Row: {
           album: string | null

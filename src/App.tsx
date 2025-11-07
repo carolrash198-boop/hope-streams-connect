@@ -33,6 +33,7 @@ import AdminSundaySchoolContent from "./pages/admin/SundaySchoolContent";
 import AdminOutreach from "./pages/admin/Outreach";
 import AdminVolunteers from "./pages/admin/Volunteers";
 import AdminHeroSettings from "./pages/admin/HeroSettings";
+import AdminFooterSettings from "./pages/admin/FooterSettings";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
           <Route path="/admin/auth" element={<AdminAuth />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/hero-settings" element={<AdminHeroSettings />} />
+          <Route path="/admin/footer-settings" element={<AdminFooterSettings />} />
           <Route path="/admin/services" element={<AdminServices />} />
           <Route path="/admin/events" element={<AdminEvents />} />
           <Route path="/admin/sermons" element={<AdminSermons />} />

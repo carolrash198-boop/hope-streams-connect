@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 const navigation = [
   { name: "Dashboard", icon: Home, path: "/admin/dashboard" },
   { name: "Hero Settings", icon: Settings, path: "/admin/hero-settings" },
+  { name: "Footer Settings", icon: Settings, path: "/admin/footer-settings" },
   { name: "Services", icon: Church, path: "/admin/services" },
   { name: "Events", icon: Calendar, path: "/admin/events" },
   { name: "Sermons", icon: FileText, path: "/admin/sermons" },
