@@ -272,10 +272,14 @@ export type Database = {
           is_anonymous: boolean | null
           is_recurring: boolean | null
           payment_method: string | null
+          payment_method_id: string | null
           recurrence_interval: string | null
+          selected_currency: string | null
           status: string | null
           stripe_payment_id: string | null
+          transaction_code: string | null
           user_id: string | null
+          verification_status: string | null
         }
         Insert: {
           amount: number
@@ -289,10 +293,14 @@ export type Database = {
           is_anonymous?: boolean | null
           is_recurring?: boolean | null
           payment_method?: string | null
+          payment_method_id?: string | null
           recurrence_interval?: string | null
+          selected_currency?: string | null
           status?: string | null
           stripe_payment_id?: string | null
+          transaction_code?: string | null
           user_id?: string | null
+          verification_status?: string | null
         }
         Update: {
           amount?: number
@@ -306,10 +314,14 @@ export type Database = {
           is_anonymous?: boolean | null
           is_recurring?: boolean | null
           payment_method?: string | null
+          payment_method_id?: string | null
           recurrence_interval?: string | null
+          selected_currency?: string | null
           status?: string | null
           stripe_payment_id?: string | null
+          transaction_code?: string | null
           user_id?: string | null
+          verification_status?: string | null
         }
         Relationships: [
           {
@@ -317,6 +329,13 @@ export type Database = {
             columns: ["campaign_id"]
             isOneToOne: false
             referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donations_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
             referencedColumns: ["id"]
           },
         ]
@@ -728,6 +747,48 @@ export type Database = {
           title?: string
           updated_at?: string | null
           volunteers_needed?: string | null
+        }
+        Relationships: []
+      }
+      payment_methods: {
+        Row: {
+          account_name: string | null
+          account_number: string
+          created_at: string | null
+          created_by: string | null
+          display_order: number | null
+          id: string
+          instructions: string | null
+          is_active: boolean | null
+          method_type: string
+          provider_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          account_name?: string | null
+          account_number: string
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean | null
+          method_type: string
+          provider_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          account_name?: string | null
+          account_number?: string
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean | null
+          method_type?: string
+          provider_name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

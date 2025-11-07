@@ -1,8 +1,19 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { DollarSign, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const Donations = () => {
   const [donations, setDonations] = useState<any[]>([]);
@@ -13,59 +24,153 @@ const Donations = () => {
   }, []);
 
   const fetchDonations = async () => {
-    const { data, error } = await supabase
-      .from("donations")
-      .select("*")
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("donations")
+        .select(`
+          *,
+          payment_methods(provider_name),
+          campaigns(title)
+        `)
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      toast.error("Failed to load donations");
-    } else {
+      if (error) throw error;
+
       setDonations(data || []);
-      const total = data?.reduce((sum, d) => sum + parseFloat(d.amount.toString()), 0) || 0;
+      
+      // Calculate total amount
+      const total = (data || []).reduce((sum, donation) => sum + Number(donation.amount), 0);
       setTotalAmount(total);
+    } catch (error) {
+      console.error("Error fetching donations:", error);
+      toast.error("Failed to fetch donations");
     }
   };
 
+  const handleVerifyDonation = async (id: string, status: 'verified' | 'rejected') => {
+    const { error } = await supabase
+      .from("donations")
+      .update({ verification_status: status })
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to update donation status");
+      return;
+    }
+
+    toast.success(`Donation ${status} successfully`);
+    fetchDonations();
+  };
+
+  const getStatusBadge = (status: string) => {
+    const styles = {
+      pending: "bg-yellow-100 text-yellow-800",
+      verified: "bg-green-100 text-green-800",
+      rejected: "bg-red-100 text-red-800",
+    };
+    return styles[status as keyof typeof styles] || styles.pending;
+  };
+
   return (
-    <div className="flex min-h-screen bg-muted/10">
+    <div className="flex min-h-screen bg-background">
       <AdminSidebar />
-      <div className="flex-1 p-8">
+      <main className="flex-1 p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Donations</h1>
-          <p className="text-muted-foreground">View donation history</p>
-          <p className="text-2xl font-bold mt-4">Total: ${totalAmount.toFixed(2)}</p>
+          <p className="text-muted-foreground">Manage and verify donation submissions</p>
         </div>
 
-        <div className="grid gap-4">
-          {donations.map((donation) => (
-            <Card key={donation.id}>
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold">
-                      {donation.is_anonymous ? "Anonymous" : `${donation.donor_first_name} ${donation.donor_last_name}`}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(donation.created_at).toLocaleString()}
-                    </p>
-                    {!donation.is_anonymous && donation.donor_email && (
-                      <p className="text-sm text-muted-foreground">{donation.donor_email}</p>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold">${parseFloat(donation.amount.toString()).toFixed(2)}</p>
-                    <p className="text-sm text-muted-foreground">{donation.status}</p>
-                    {donation.is_recurring && (
-                      <p className="text-xs text-primary">Recurring: {donation.recurrence_interval}</p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <DollarSign className="h-6 w-6" />
+              <span>Total Donations</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-bold">${totalAmount.toFixed(2)}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Donation Records</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Donor</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Currency</TableHead>
+                    <TableHead>Campaign</TableHead>
+                    <TableHead>Payment Method</TableHead>
+                    <TableHead>Transaction Code</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {donations.map((donation: any) => (
+                    <TableRow key={donation.id}>
+                      <TableCell>
+                        {new Date(donation.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {donation.is_anonymous
+                          ? "Anonymous"
+                          : donation.donor_email || "N/A"}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {donation.amount}
+                      </TableCell>
+                      <TableCell>
+                        {donation.selected_currency || "USD"}
+                      </TableCell>
+                      <TableCell>
+                        {donation.campaigns?.title || "General Fund"}
+                      </TableCell>
+                      <TableCell>
+                        {donation.payment_methods?.provider_name || "N/A"}
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {donation.transaction_code || "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusBadge(donation.verification_status)}>
+                          {donation.verification_status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {donation.verification_status === "pending" && (
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleVerifyDonation(donation.id, "verified")}
+                            >
+                              <CheckCircle2 className="h-4 w-4 text-green-600" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleVerifyDonation(donation.id, "rejected")}
+                            >
+                              <XCircle className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 };

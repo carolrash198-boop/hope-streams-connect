@@ -1,25 +1,66 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, CreditCard, Calendar, Target, Users, Church, Globe, GraduationCap, Shield } from "lucide-react";
+import { toast } from "sonner";
+import { Heart, Copy, CheckCircle2, DollarSign } from "lucide-react";
+import { AuthModal } from "@/components/auth/AuthModal";
+
+interface Campaign {
+  id: string;
+  title: string;
+  description: string;
+  goal_amount: number;
+  current_amount: number;
+  slug: string;
+}
 
 const Donate = () => {
   const [amount, setAmount] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
-  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [transactionCode, setTransactionCode] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const [customCurrency, setCustomCurrency] = useState("");
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCampaigns();
+    fetchPaymentMethods();
+    checkUser();
   }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+  };
+
+  const fetchPaymentMethods = async () => {
+    const { data, error } = await supabase
+      .from("payment_methods")
+      .select("*")
+      .eq("is_active", true)
+      .order("display_order");
+
+    if (error) {
+      toast.error("Failed to load payment methods");
+      return;
+    }
+
+    setPaymentMethods(data || []);
+  };
 
   const fetchCampaigns = async () => {
     try {
@@ -40,205 +81,315 @@ const Donate = () => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard!");
+  };
+
+  const maskAccountNumber = (account: string) => {
+    if (account.length <= 4) return account;
+    return account.slice(0, 2) + "*".repeat(account.length - 4) + account.slice(-2);
+  };
+
+  const handleProceedToPayment = () => {
+    if (!amount || parseFloat(amount) <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    setShowPaymentForm(true);
+  };
+
+  const handleSubmitDonation = async () => {
+    if (!transactionCode || !selectedPaymentMethod) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    const finalCurrency = selectedCurrency === "other" ? customCurrency : selectedCurrency;
+
+    const { error } = await supabase.from("donations").insert({
+      user_id: user?.id,
+      amount: parseFloat(amount),
+      campaign_id: selectedCampaign || null,
+      is_recurring: isRecurring,
+      payment_method_id: selectedPaymentMethod,
+      transaction_code: transactionCode,
+      selected_currency: finalCurrency,
+      verification_status: "pending",
+      donor_email: user?.email,
+    });
+
+    if (error) {
+      toast.error("Failed to submit donation");
+      return;
+    }
+
+    toast.success("Donation submitted for verification!");
+    setAmount("");
+    setTransactionCode("");
+    setShowPaymentForm(false);
   };
 
   const quickAmounts = [25, 50, 100, 250, 500, 1000];
 
   return (
     <Layout>
-      <div className="min-h-screen">
-        {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-br from-accent to-accent/80 text-white">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="mb-6">Give a Gift</h1>
-            <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-              Your generous giving helps us serve our community, support families in need, 
-              and spread God's love. Every gift makes a difference.
+      {/* Hero Section */}
+      <section className="relative py-20 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+              Give a Gift
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Your generosity helps us spread hope and serve our community
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" variant="secondary">
-                <a href="#donate-now">Give Now</a>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Button size="lg" className="group" onClick={() => document.getElementById('donate-now')?.scrollIntoView({ behavior: 'smooth' })}>
+                <Heart className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+                Donate Now
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60">
-                <a href="#campaigns">View Campaigns</a>
+              <Button size="lg" variant="outline" onClick={() => document.getElementById('campaigns')?.scrollIntoView({ behavior: 'smooth' })}>
+                View Campaigns
               </Button>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Donation Form */}
-        <section id="donate-now" className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <Tabs defaultValue="general" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="general">General Giving</TabsTrigger>
-                  <TabsTrigger value="campaigns">Specific Campaigns</TabsTrigger>
-                </TabsList>
+      {/* Main Donation Section */}
+      <section id="donate-now" className="py-16">
+        <div className="container mx-auto px-4">
+          <Tabs defaultValue="general" className="max-w-4xl mx-auto" onValueChange={(value) => {
+            if (value === "general") setSelectedCampaign(null);
+          }}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="general">General Giving</TabsTrigger>
+              <TabsTrigger value="campaigns" id="campaigns">Specific Campaigns</TabsTrigger>
+            </TabsList>
 
-                <TabsContent value="general" className="mt-8">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <Heart className="h-6 w-6 text-accent" />
-                        <span>General Fund Donation</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      {/* Quick Amount Buttons */}
-                      <div>
-                        <Label className="text-base font-medium mb-4 block">Select Amount</Label>
-                        <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
-                          {quickAmounts.map((quickAmount) => (
-                            <Button
-                              key={quickAmount}
-                              variant={amount === quickAmount.toString() ? "default" : "outline"}
-                              onClick={() => setAmount(quickAmount.toString())}
-                              className="h-12"
-                            >
-                              ${quickAmount}
-                            </Button>
-                          ))}
+            <TabsContent value="general">
+              <Card>
+                <CardHeader>
+                  <CardTitle>General Fund Donation</CardTitle>
+                  <CardDescription>Support our church's ongoing mission and ministry</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                    {quickAmounts.map((quickAmount) => (
+                      <Button
+                        key={quickAmount}
+                        variant={amount === quickAmount.toString() ? "default" : "outline"}
+                        onClick={() => setAmount(quickAmount.toString())}
+                        size="sm"
+                      >
+                        ${quickAmount}
+                      </Button>
+                    ))}
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="currency">Select Currency</Label>
+                      <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USD">USD - US Dollar</SelectItem>
+                          <SelectItem value="EUR">EUR - Euro</SelectItem>
+                          <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                          <SelectItem value="KES">KES - Kenyan Shilling</SelectItem>
+                          <SelectItem value="other">Other (Type below)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {selectedCurrency === "other" && (
+                        <Input
+                          placeholder="Enter your currency code (e.g., JPY)"
+                          value={customCurrency}
+                          onChange={(e) => setCustomCurrency(e.target.value)}
+                          className="mt-2"
+                        />
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="amount">Enter Amount</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        placeholder="0.00"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="flex gap-4">
+                      <Button
+                        variant={!isRecurring ? "default" : "outline"}
+                        onClick={() => setIsRecurring(false)}
+                        className="flex-1"
+                      >
+                        One-time
+                      </Button>
+                      <Button
+                        variant={isRecurring ? "default" : "outline"}
+                        onClick={() => setIsRecurring(true)}
+                        className="flex-1"
+                      >
+                        Monthly
+                      </Button>
+                    </div>
+                  </div>
+
+                  {!showPaymentForm ? (
+                    <div className="pt-6 space-y-4">
+                      <div className="bg-muted p-4 rounded-lg space-y-2">
+                        <h3 className="font-semibold">Donation Summary</h3>
+                        <div className="flex justify-between text-sm">
+                          <span>Amount:</span>
+                          <span className="font-medium">{selectedCurrency === "other" ? customCurrency : selectedCurrency} {amount || "0.00"}</span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-lg">$</span>
+                        <div className="flex justify-between text-sm">
+                          <span>Frequency:</span>
+                          <span className="font-medium">{isRecurring ? "Monthly" : "One-time"}</span>
+                        </div>
+                      </div>
+                      <Button className="w-full" size="lg" onClick={handleProceedToPayment}>
+                        Proceed to Payment
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="pt-6 space-y-6">
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-lg">How to Pay</h3>
+                        
+                        {paymentMethods.map((method) => (
+                          <Card key={method.id} className="p-4">
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-medium">{method.provider_name}</h4>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => copyToClipboard(method.account_number)}
+                                >
+                                  <Copy className="h-4 w-4 mr-1" />
+                                  Copy
+                                </Button>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{method.instructions}</p>
+                              <div className="bg-muted p-2 rounded font-mono text-sm">
+                                {method.account_name && <div>Name: {method.account_name}</div>}
+                                <div>Account: {maskAccountNumber(method.account_number)}</div>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+
+                      <div className="space-y-4 border-t pt-6">
+                        <h3 className="font-semibold text-lg">Submit Transaction Details</h3>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="payment-method">Payment Method Used</Label>
+                          <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select payment method" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {paymentMethods.map((method) => (
+                                <SelectItem key={method.id} value={method.id}>
+                                  {method.provider_name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="transaction-code">Transaction Code/Reference</Label>
                           <Input
-                            type="number"
-                            placeholder="Enter custom amount"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                            className="text-lg"
+                            id="transaction-code"
+                            placeholder="Enter your transaction code"
+                            value={transactionCode}
+                            onChange={(e) => setTransactionCode(e.target.value)}
                           />
                         </div>
+
+                        <Button className="w-full" size="lg" onClick={handleSubmitDonation}>
+                          <CheckCircle2 className="mr-2 h-5 w-5" />
+                          Submit for Verification
+                        </Button>
                       </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                      {/* Frequency */}
-                      <div>
-                        <Label className="text-base font-medium mb-4 block">Frequency</Label>
-                        <div className="grid grid-cols-2 gap-4">
-                          <Button
-                            variant={!isRecurring ? "default" : "outline"}
-                            onClick={() => setIsRecurring(false)}
-                            className="h-12"
-                          >
-                            One-Time Gift
-                          </Button>
-                          <Button
-                            variant={isRecurring ? "default" : "outline"}
-                            onClick={() => setIsRecurring(true)}
-                            className="h-12"
-                          >
-                            Monthly Giving
-                          </Button>
+            <TabsContent value="campaigns" className="space-y-6">
+              {loading ? (
+                <div className="text-center py-12">Loading campaigns...</div>
+              ) : campaigns.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <p className="text-muted-foreground">No active campaigns at the moment.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                campaigns.map((campaign) => (
+                  <Card key={campaign.id}>
+                    <CardHeader>
+                      <CardTitle>{campaign.title}</CardTitle>
+                      <CardDescription>{campaign.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Progress</span>
+                          <span className="font-medium">
+                            {formatAmount(campaign.current_amount)} of {formatAmount(campaign.goal_amount)}
+                          </span>
                         </div>
+                        <Progress 
+                          value={(campaign.current_amount / campaign.goal_amount) * 100} 
+                          className="h-2"
+                        />
                       </div>
-
-                      {/* Summary */}
-                      {amount && (
-                        <div className="bg-accent/10 rounded-lg p-4">
-                          <h3 className="font-semibold mb-2">Donation Summary</h3>
-                          <p className="text-lg">
-                            <span className="font-bold text-accent">${amount}</span>
-                            {isRecurring ? " per month" : " one-time"}
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Supporting Free Pentecostal Fellowship General Fund
-                          </p>
-                        </div>
-                      )}
-
                       <Button 
-                        className="w-full h-12 text-lg"
-                        disabled={!amount || parseFloat(amount) <= 0}
+                        className="w-full"
+                        onClick={() => {
+                          setSelectedCampaign(campaign.id);
+                          handleProceedToPayment();
+                        }}
                       >
-                        <CreditCard className="h-5 w-5 mr-2" />
-                        Proceed to Payment
+                        <DollarSign className="mr-2 h-4 w-4" />
+                        Support This Campaign
                       </Button>
                     </CardContent>
                   </Card>
-                </TabsContent>
+                ))
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </section>
 
-                <TabsContent value="campaigns" className="mt-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {campaigns.map((campaign) => {
-                      const progress = campaign.goal_amount ? 
-                        (campaign.current_amount / campaign.goal_amount) * 100 : 0;
-                      
-                      return (
-                        <Card key={campaign.id}>
-                          <CardContent className="p-6">
-                            <h3 className="font-semibold mb-2">{campaign.title}</h3>
-                            <p className="text-sm text-muted-foreground mb-4">
-                              {campaign.description}
-                            </p>
-                            
-                            {campaign.goal_amount && (
-                              <div className="space-y-2 mb-4">
-                                <div className="flex justify-between text-sm">
-                                  <span>Progress</span>
-                                  <span>
-                                    {formatAmount(campaign.current_amount)} of {formatAmount(campaign.goal_amount)}
-                                  </span>
-                                </div>
-                                <Progress value={progress} className="h-2" />
-                                <p className="text-xs text-muted-foreground text-right">
-                                  {progress.toFixed(0)}% complete
-                                </p>
-                              </div>
-                            )}
-                            
-                            <Button className="w-full">
-                              <Heart className="h-4 w-4 mr-2" />
-                              Support This Campaign
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </section>
-
-        {/* Security & Trust */}
-        <section className="py-20 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="mb-6">Safe & Secure Giving</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Your generosity is protected by industry-leading security measures.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              <div className="text-center">
-                <Shield className="h-12 w-12 mx-auto mb-4 text-accent" />
-                <h3 className="font-semibold mb-2">SSL Encrypted</h3>
-                <p className="text-sm text-muted-foreground">Bank-level security</p>
-              </div>
-              <div className="text-center">
-                <CreditCard className="h-12 w-12 mx-auto mb-4 text-accent" />
-                <h3 className="font-semibold mb-2">Multiple Options</h3>
-                <p className="text-sm text-muted-foreground">Credit, debit, ACH</p>
-              </div>
-              <div className="text-center">
-                <Calendar className="h-12 w-12 mx-auto mb-4 text-accent" />
-                <h3 className="font-semibold mb-2">Flexible Giving</h3>
-                <p className="text-sm text-muted-foreground">One-time or recurring</p>
-              </div>
-              <div className="text-center">
-                <Target className="h-12 w-12 mx-auto mb-4 text-accent" />
-                <h3 className="font-semibold mb-2">Tax Receipts</h3>
-                <p className="text-sm text-muted-foreground">Instant confirmation</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
+      <AuthModal 
+        open={showAuthModal} 
+        onOpenChange={setShowAuthModal}
+        onSuccess={checkUser}
+      />
     </Layout>
   );
 };
