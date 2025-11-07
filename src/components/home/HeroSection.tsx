@@ -1,8 +1,38 @@
 import { Button } from "@/components/ui/button";
 import { Play, Heart, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useVideoPlayer } from "@/contexts/VideoPlayerContext";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const HeroSection = () => {
+  const { openVideo } = useVideoPlayer();
+  const [liveStreamUrl, setLiveStreamUrl] = useState<string>('');
+  const [liveStreamTitle, setLiveStreamTitle] = useState<string>('');
+
+  useEffect(() => {
+    const fetchLiveStream = async () => {
+      const { data } = await supabase
+        .from('live_stream_settings')
+        .select('*')
+        .eq('is_active', true)
+        .limit(1)
+        .single();
+      
+      if (data) {
+        setLiveStreamUrl(data.youtube_url || data.facebook_url || '');
+        setLiveStreamTitle(data.service_name || 'Live Stream');
+      }
+    };
+    fetchLiveStream();
+  }, []);
+
+  const handleWatchLive = () => {
+    if (liveStreamUrl) {
+      openVideo(liveStreamUrl, liveStreamTitle);
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Gradient */}
@@ -40,12 +70,24 @@ export const HeroSection = () => {
               </Link>
             </Button>
             
-            <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60 text-lg px-8 py-3">
-              <Link to="/bible-studies" className="flex items-center space-x-2">
-                <Play className="h-5 w-5" />
+            {liveStreamUrl ? (
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60 text-lg px-8 py-3"
+                onClick={handleWatchLive}
+              >
+                <Play className="h-5 w-5 mr-2" />
                 <span>Watch Live</span>
-              </Link>
-            </Button>
+              </Button>
+            ) : (
+              <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60 text-lg px-8 py-3">
+                <Link to="/bible-studies" className="flex items-center space-x-2">
+                  <Play className="h-5 w-5" />
+                  <span>Watch Live</span>
+                </Link>
+              </Button>
+            )}
             
             <Button asChild size="lg" variant="secondary" className="bg-white/10 text-white border border-white/20 hover:bg-white/20 text-lg px-8 py-3">
               <Link to="/donate" className="flex items-center space-x-2">

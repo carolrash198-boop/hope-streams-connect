@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { Play, Download, Calendar, User, BookOpen, Search, Filter, Clock, Tag, Share2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useVideoPlayer } from "@/contexts/VideoPlayerContext";
 
 interface Sermon {
   id: string;
@@ -33,6 +34,7 @@ const BibleStudies = () => {
   const [filterTag, setFilterTag] = useState("all");
   const [sortBy, setSortBy] = useState("date-desc");
   const [liveStreamSettings, setLiveStreamSettings] = useState<any[]>([]);
+  const { openVideo } = useVideoPlayer();
 
   const [allSeries, setAllSeries] = useState<string[]>([]);
   const [allPreachers, setAllPreachers] = useState<string[]>([]);
@@ -401,17 +403,16 @@ const BibleStudies = () => {
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       {setting.youtube_url && (
-                        <Button asChild>
-                          <a href={setting.youtube_url} target="_blank" rel="noopener noreferrer">
-                            Watch on YouTube
-                          </a>
+                        <Button onClick={() => openVideo(setting.youtube_url, setting.service_name)}>
+                          Watch on YouTube
                         </Button>
                       )}
                       {setting.facebook_url && (
-                        <Button asChild variant="outline">
-                          <a href={setting.facebook_url} target="_blank" rel="noopener noreferrer">
-                            Watch on Facebook
-                          </a>
+                        <Button 
+                          variant="outline"
+                          onClick={() => openVideo(setting.facebook_url, setting.service_name)}
+                        >
+                          Watch on Facebook
                         </Button>
                       )}
                     </div>
