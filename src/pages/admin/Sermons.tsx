@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Upload } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Sermons = () => {
   const [sermons, setSermons] = useState<any[]>([]);
@@ -25,6 +26,10 @@ const Sermons = () => {
     show_notes: "",
     is_published: true,
   });
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
 
   useEffect(() => {
     fetchSermons();
@@ -43,15 +48,56 @@ const Sermons = () => {
     }
   };
 
+  const uploadFile = async (file: File, type: 'video' | 'audio') => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${type}s/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('sermon-media')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from('sermon-media')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      let videoUrl = formData.video_url;
+      let audioUrl = formData.audio_url;
+
+      // Upload video file if selected
+      if (videoFile) {
+        setUploadingVideo(true);
+        videoUrl = await uploadFile(videoFile, 'video');
+        setUploadingVideo(false);
+      }
+
+      // Upload audio file if selected
+      if (audioFile) {
+        setUploadingAudio(true);
+        audioUrl = await uploadFile(audioFile, 'audio');
+        setUploadingAudio(false);
+      }
+
+      const dataToSave = {
+        ...formData,
+        video_url: videoUrl,
+        audio_url: audioUrl,
+      };
+
       if (editingSermon) {
         const { error } = await supabase
           .from("sermons")
-          .update(formData)
+          .update(dataToSave)
           .eq("id", editingSermon.id);
 
         if (error) throw error;
@@ -59,7 +105,7 @@ const Sermons = () => {
       } else {
         const { error } = await supabase
           .from("sermons")
-          .insert([formData]);
+          .insert([dataToSave]);
 
         if (error) throw error;
         toast.success("Sermon created successfully");
@@ -72,6 +118,8 @@ const Sermons = () => {
       toast.error(error.message);
     } finally {
       setLoading(false);
+      setUploadingVideo(false);
+      setUploadingAudio(false);
     }
   };
 
@@ -103,6 +151,8 @@ const Sermons = () => {
       is_published: true,
     });
     setEditingSermon(null);
+    setVideoFile(null);
+    setAudioFile(null);
   };
 
   const handleEdit = (sermon: any) => {
@@ -179,20 +229,88 @@ const Sermons = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="video_url">Video URL</Label>
-                  <Input
-                    id="video_url"
-                    value={formData.video_url}
-                    onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                  />
+                  <Label>Video</Label>
+                  <Tabs defaultValue="url" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="url">Enter URL</TabsTrigger>
+                      <TabsTrigger value="upload">Upload File</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="url">
+                      <Input
+                        placeholder="https://youtube.com/watch?v=..."
+                        value={formData.video_url}
+                        onChange={(e) => {
+                          setFormData({ ...formData, video_url: e.target.value });
+                          setVideoFile(null);
+                        }}
+                      />
+                    </TabsContent>
+                    <TabsContent value="upload">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="file"
+                          accept="video/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setVideoFile(file);
+                              setFormData({ ...formData, video_url: "" });
+                            }
+                          }}
+                        />
+                        {videoFile && (
+                          <span className="text-sm text-muted-foreground">
+                            {videoFile.name}
+                          </span>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                  {uploadingVideo && (
+                    <p className="text-sm text-muted-foreground mt-2">Uploading video...</p>
+                  )}
                 </div>
                 <div>
-                  <Label htmlFor="audio_url">Audio URL</Label>
-                  <Input
-                    id="audio_url"
-                    value={formData.audio_url}
-                    onChange={(e) => setFormData({ ...formData, audio_url: e.target.value })}
-                  />
+                  <Label>Audio</Label>
+                  <Tabs defaultValue="url" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="url">Enter URL</TabsTrigger>
+                      <TabsTrigger value="upload">Upload File</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="url">
+                      <Input
+                        placeholder="https://example.com/audio.mp3"
+                        value={formData.audio_url}
+                        onChange={(e) => {
+                          setFormData({ ...formData, audio_url: e.target.value });
+                          setAudioFile(null);
+                        }}
+                      />
+                    </TabsContent>
+                    <TabsContent value="upload">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="file"
+                          accept="audio/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setAudioFile(file);
+                              setFormData({ ...formData, audio_url: "" });
+                            }
+                          }}
+                        />
+                        {audioFile && (
+                          <span className="text-sm text-muted-foreground">
+                            {audioFile.name}
+                          </span>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                  {uploadingAudio && (
+                    <p className="text-sm text-muted-foreground mt-2">Uploading audio...</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="show_notes">Show Notes</Label>
