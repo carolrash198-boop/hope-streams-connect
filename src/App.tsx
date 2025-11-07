@@ -19,6 +19,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminEvents from "./pages/admin/Events";
 import AdminSermons from "./pages/admin/Sermons";
 import AdminLiveStream from "./pages/admin/LiveStream";
+import AdminLiveCoverage from "./pages/admin/LiveCoverage";
 import AdminContact from "./pages/admin/Contact";
 import AdminGallery from "./pages/admin/Gallery";
 import AdminPrayers from "./pages/admin/Prayers";
@@ -57,6 +58,7 @@ const App = () => (
           <Route path="/admin/events" element={<AdminEvents />} />
           <Route path="/admin/sermons" element={<AdminSermons />} />
           <Route path="/admin/live-stream" element={<AdminLiveStream />} />
+          <Route path="/admin/live-coverage" element={<AdminLiveCoverage />} />
           <Route path="/admin/outreach" element={<AdminOutreach />} />
           <Route path="/admin/volunteers" element={<AdminVolunteers />} />
           <Route path="/admin/contact" element={<AdminContact />} />

@@ -8,6 +8,7 @@ const navigation = [
   { name: "Events", icon: Calendar, path: "/admin/events" },
   { name: "Sermons", icon: FileText, path: "/admin/sermons" },
   { name: "Live Stream", icon: Video, path: "/admin/live-stream" },
+  { name: "Live Coverage", icon: Video, path: "/admin/live-coverage" },
   { name: "Outreach", icon: HandHeart, path: "/admin/outreach" },
   { name: "Volunteers", icon: Users, path: "/admin/volunteers" },
   { name: "Sunday School", icon: GraduationCap, path: "/admin/sunday-school" },

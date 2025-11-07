@@ -5,11 +5,9 @@ interface VideoPlayerContextType {
   videoUrl: string;
   videoTitle: string;
   isMinimized: boolean;
-  isFloating: boolean;
   openVideo: (url: string, title: string) => void;
   closeVideo: () => void;
   toggleMinimize: () => void;
-  toggleFloating: () => void;
 }
 
 const VideoPlayerContext = createContext<VideoPlayerContextType | undefined>(undefined);
@@ -19,14 +17,12 @@ export const VideoPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [videoUrl, setVideoUrl] = useState('');
   const [videoTitle, setVideoTitle] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
-  const [isFloating, setIsFloating] = useState(false);
 
   const openVideo = (url: string, title: string) => {
     setVideoUrl(url);
     setVideoTitle(title);
     setIsOpen(true);
     setIsMinimized(false);
-    setIsFloating(false);
   };
 
   const closeVideo = () => {
@@ -34,21 +30,10 @@ export const VideoPlayerProvider = ({ children }: { children: ReactNode }) => {
     setVideoUrl('');
     setVideoTitle('');
     setIsMinimized(false);
-    setIsFloating(false);
   };
 
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
-    if (!isMinimized) {
-      setIsFloating(true);
-    }
-  };
-
-  const toggleFloating = () => {
-    setIsFloating(!isFloating);
-    if (isFloating) {
-      setIsMinimized(false);
-    }
   };
 
   return (
@@ -58,11 +43,9 @@ export const VideoPlayerProvider = ({ children }: { children: ReactNode }) => {
         videoUrl,
         videoTitle,
         isMinimized,
-        isFloating,
         openVideo,
         closeVideo,
         toggleMinimize,
-        toggleFloating,
       }}
     >
       {children}
