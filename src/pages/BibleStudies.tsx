@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, Download, Calendar, User, BookOpen, Search, Filter, Clock, Tag, Share2 } from "lucide-react";
+import { Play, Download, Calendar, User, BookOpen, Search, Filter, Clock, Tag, Share2, Eye, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useVideoPlayer } from "@/contexts/VideoPlayerContext";
+import { toast } from "@/hooks/use-toast";
 
 interface Sermon {
   id: string;
@@ -23,6 +24,8 @@ interface Sermon {
   download_count: number;
   slug: string;
   show_notes: string | null;
+  video_url: string | null;
+  audio_url: string | null;
 }
 
 const BibleStudies = () => {
@@ -132,6 +135,86 @@ const BibleStudies = () => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  };
+
+  const handlePlaySermon = (sermon: Sermon) => {
+    const url = sermon.video_url || sermon.audio_url;
+    if (url) {
+      openVideo(url, sermon.title);
+    } else {
+      toast({
+        title: "Not Available",
+        description: "This sermon doesn't have media available yet.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownload = async (sermon: Sermon) => {
+    const url = sermon.video_url || sermon.audio_url;
+    if (!url) {
+      toast({
+        title: "Not Available",
+        description: "No downloadable media available for this sermon.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Increment download count
+      await supabase
+        .from('sermons')
+        .update({ download_count: sermon.download_count + 1 })
+        .eq('id', sermon.id);
+
+      // Open the URL in a new tab for download
+      window.open(url, '_blank');
+      
+      toast({
+        title: "Download Started",
+        description: "Your download should begin shortly.",
+      });
+
+      // Refresh sermons to update count
+      fetchSermons();
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: "Download Failed",
+        description: "There was an error starting the download.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleShare = async (sermon: Sermon) => {
+    const shareData = {
+      title: sermon.title,
+      text: `Listen to "${sermon.title}" by ${sermon.preacher}`,
+      url: `${window.location.origin}/bible-studies/${sermon.slug}`,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast({
+          title: "Shared Successfully",
+          description: "Thanks for sharing!",
+        });
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(shareData.url);
+        toast({
+          title: "Link Copied",
+          description: "Sermon link copied to clipboard!",
+        });
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.error('Share error:', error);
+      }
+    }
   };
 
   return (
@@ -344,14 +427,36 @@ const BibleStudies = () => {
                       )}
 
                       {/* Actions */}
-                      <div className="flex space-x-2">
-                        <Button asChild size="sm" className="flex-1">
-                          <Link to={`/bible-studies/${sermon.slug}`}>
-                            <Play className="h-4 w-4 mr-2" />
-                            Listen
-                          </Link>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => handlePlaySermon(sermon)}
+                          size="sm" 
+                          className="flex-1"
+                        >
+                          {sermon.video_url ? (
+                            <>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Watch
+                            </>
+                          ) : (
+                            <>
+                              <Headphones className="h-4 w-4 mr-2" />
+                              Listen
+                            </>
+                          )}
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          onClick={() => handleDownload(sermon)}
+                          size="sm" 
+                          variant="outline"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          onClick={() => handleShare(sermon)}
+                          size="sm" 
+                          variant="outline"
+                        >
                           <Share2 className="h-4 w-4" />
                         </Button>
                       </div>
