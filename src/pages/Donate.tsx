@@ -366,16 +366,197 @@ const Donate = () => {
                           className="h-2"
                         />
                       </div>
-                      <Button 
-                        className="w-full"
-                        onClick={() => {
-                          setSelectedCampaign(campaign.id);
-                          handleProceedToPayment();
-                        }}
-                      >
-                        <DollarSign className="mr-2 h-4 w-4" />
-                        Support This Campaign
-                      </Button>
+                       {(!selectedCampaign || selectedCampaign !== campaign.id) ? (
+                        <Button 
+                          className="w-full"
+                          onClick={() => {
+                            setSelectedCampaign(campaign.id);
+                            setShowPaymentForm(false);
+                            setAmount("");
+                          }}
+                        >
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          Support This Campaign
+                        </Button>
+                      ) : (
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                            {quickAmounts.map((quickAmount) => (
+                              <Button
+                                key={quickAmount}
+                                variant={amount === quickAmount.toString() ? "default" : "outline"}
+                                onClick={() => setAmount(quickAmount.toString())}
+                                size="sm"
+                              >
+                                ${quickAmount}
+                              </Button>
+                            ))}
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="space-y-2">
+                              <Label htmlFor={`currency-${campaign.id}`}>Select Currency</Label>
+                              <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select currency" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="USD">USD - US Dollar</SelectItem>
+                                  <SelectItem value="EUR">EUR - Euro</SelectItem>
+                                  <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                                  <SelectItem value="KES">KES - Kenyan Shilling</SelectItem>
+                                  <SelectItem value="other">Other (Type below)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {selectedCurrency === "other" && (
+                                <Input
+                                  placeholder="Enter your currency code (e.g., JPY)"
+                                  value={customCurrency}
+                                  onChange={(e) => setCustomCurrency(e.target.value)}
+                                  className="mt-2"
+                                />
+                              )}
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor={`amount-${campaign.id}`}>Enter Amount</Label>
+                              <Input
+                                id={`amount-${campaign.id}`}
+                                type="number"
+                                placeholder="0.00"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                              />
+                            </div>
+
+                            <div className="flex gap-4">
+                              <Button
+                                variant={!isRecurring ? "default" : "outline"}
+                                onClick={() => setIsRecurring(false)}
+                                className="flex-1"
+                              >
+                                One-time
+                              </Button>
+                              <Button
+                                variant={isRecurring ? "default" : "outline"}
+                                onClick={() => setIsRecurring(true)}
+                                className="flex-1"
+                              >
+                                Monthly
+                              </Button>
+                            </div>
+                          </div>
+
+                          {!showPaymentForm ? (
+                            <div className="pt-6 space-y-4">
+                              <div className="bg-muted p-4 rounded-lg space-y-2">
+                                <h3 className="font-semibold">Donation Summary</h3>
+                                <div className="flex justify-between text-sm">
+                                  <span>Campaign:</span>
+                                  <span className="font-medium">{campaign.title}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>Amount:</span>
+                                  <span className="font-medium">{selectedCurrency === "other" ? customCurrency : selectedCurrency} {amount || "0.00"}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>Frequency:</span>
+                                  <span className="font-medium">{isRecurring ? "Monthly" : "One-time"}</span>
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  className="flex-1" 
+                                  onClick={() => {
+                                    setSelectedCampaign(null);
+                                    setAmount("");
+                                    setShowPaymentForm(false);
+                                  }}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button className="flex-1" onClick={handleProceedToPayment}>
+                                  Proceed to Payment
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="pt-6 space-y-6">
+                              <div className="space-y-4">
+                                <h3 className="font-semibold text-lg">How to Pay</h3>
+                                
+                                {paymentMethods.map((method) => (
+                                  <Card key={method.id} className="p-4">
+                                    <div className="space-y-2">
+                                      <div className="flex items-center justify-between">
+                                        <h4 className="font-medium">{method.provider_name}</h4>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => copyToClipboard(method.account_number)}
+                                        >
+                                          <Copy className="h-4 w-4 mr-1" />
+                                          Copy
+                                        </Button>
+                                      </div>
+                                      <p className="text-sm text-muted-foreground">{method.instructions}</p>
+                                      <div className="bg-muted p-2 rounded font-mono text-sm">
+                                        {method.account_name && <div>Name: {method.account_name}</div>}
+                                        <div>Account: {maskAccountNumber(method.account_number)}</div>
+                                      </div>
+                                    </div>
+                                  </Card>
+                                ))}
+                              </div>
+
+                              <div className="space-y-4 border-t pt-6">
+                                <h3 className="font-semibold text-lg">Submit Transaction Details</h3>
+                                
+                                <div className="space-y-2">
+                                  <Label htmlFor="payment-method">Payment Method Used</Label>
+                                  <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select payment method" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {paymentMethods.map((method) => (
+                                        <SelectItem key={method.id} value={method.id}>
+                                          {method.provider_name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label htmlFor="transaction-code">Transaction Code/Reference</Label>
+                                  <Input
+                                    id="transaction-code"
+                                    placeholder="Enter your transaction code"
+                                    value={transactionCode}
+                                    onChange={(e) => setTransactionCode(e.target.value)}
+                                  />
+                                </div>
+
+                                <div className="flex gap-2">
+                                  <Button 
+                                    variant="outline" 
+                                    className="flex-1" 
+                                    onClick={() => setShowPaymentForm(false)}
+                                  >
+                                    Back
+                                  </Button>
+                                  <Button className="flex-1" onClick={handleSubmitDonation}>
+                                    <CheckCircle2 className="mr-2 h-5 w-5" />
+                                    Submit for Verification
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))
