@@ -207,7 +207,7 @@ const BibleStudies = () => {
                 <Link to="#latest">Browse Sermons</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60">
-                <a href="#live" target="_blank">Watch Live</a>
+                <a href="#live">Watch Live</a>
               </Button>
             </div>
           </div>
