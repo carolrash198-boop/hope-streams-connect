@@ -476,6 +476,51 @@ export type Database = {
         }
         Relationships: []
       }
+      hero_settings: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          heading: string
+          id: string
+          is_active: boolean | null
+          next_service_title: string
+          service_location: string
+          service_name: string
+          service_time: string
+          subtitle: string
+          tagline: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          heading?: string
+          id?: string
+          is_active?: boolean | null
+          next_service_title?: string
+          service_location?: string
+          service_name?: string
+          service_time?: string
+          subtitle?: string
+          tagline?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          heading?: string
+          id?: string
+          is_active?: boolean | null
+          next_service_title?: string
+          service_location?: string
+          service_name?: string
+          service_time?: string
+          subtitle?: string
+          tagline?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       kids_programs: {
         Row: {
           age_group: string

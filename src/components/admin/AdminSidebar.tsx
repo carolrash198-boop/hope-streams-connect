@@ -1,9 +1,10 @@
-import { Home, Calendar, Mail, FileText, Image, Users, Heart, DollarSign, BookOpen, GraduationCap, UserCheck, Church, BookMarked, Video, HandHeart } from "lucide-react";
+import { Home, Calendar, Mail, FileText, Image, Users, Heart, DollarSign, BookOpen, GraduationCap, UserCheck, Church, BookMarked, Video, HandHeart, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
   { name: "Dashboard", icon: Home, path: "/admin/dashboard" },
+  { name: "Hero Settings", icon: Settings, path: "/admin/hero-settings" },
   { name: "Services", icon: Church, path: "/admin/services" },
   { name: "Events", icon: Calendar, path: "/admin/events" },
   { name: "Sermons", icon: FileText, path: "/admin/sermons" },

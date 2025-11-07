@@ -5,26 +5,65 @@ import { useVideoPlayer } from "@/contexts/VideoPlayerContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+interface HeroSettings {
+  heading: string;
+  tagline: string;
+  subtitle: string;
+  next_service_title: string;
+  service_name: string;
+  service_time: string;
+  service_location: string;
+}
+
 export const HeroSection = () => {
   const { openVideo } = useVideoPlayer();
   const [liveStreamUrl, setLiveStreamUrl] = useState<string>('');
   const [liveStreamTitle, setLiveStreamTitle] = useState<string>('');
+  const [heroSettings, setHeroSettings] = useState<HeroSettings>({
+    heading: 'Free Pentecostal Fellowship Church of Kenya',
+    tagline: 'Hope. Freedom. Community.',
+    subtitle: 'We gather to worship, heal, and serve. Join us Sundays at 9:00 AM & 11:00 AM — all are welcome.',
+    next_service_title: 'Next Service',
+    service_name: 'Sunday Worship',
+    service_time: 'This Sunday at 9:00 AM',
+    service_location: 'Main Sanctuary • Baringo County, Kenya',
+  });
 
   useEffect(() => {
-    const fetchLiveStream = async () => {
-      const { data } = await supabase
+    const fetchData = async () => {
+      // Fetch live stream settings
+      const { data: liveStream } = await supabase
         .from('live_stream_settings')
         .select('*')
         .eq('is_active', true)
         .limit(1)
-        .single();
+        .maybeSingle();
       
-      if (data) {
-        setLiveStreamUrl(data.youtube_url || data.facebook_url || '');
-        setLiveStreamTitle(data.service_name || 'Live Stream');
+      if (liveStream) {
+        setLiveStreamUrl(liveStream.youtube_url || liveStream.facebook_url || '');
+        setLiveStreamTitle(liveStream.service_name || 'Live Stream');
+      }
+
+      // Fetch hero settings
+      const { data: hero } = await supabase
+        .from('hero_settings')
+        .select('*')
+        .eq('is_active', true)
+        .maybeSingle();
+      
+      if (hero) {
+        setHeroSettings({
+          heading: hero.heading,
+          tagline: hero.tagline,
+          subtitle: hero.subtitle,
+          next_service_title: hero.next_service_title,
+          service_name: hero.service_name,
+          service_time: hero.service_time,
+          service_location: hero.service_location,
+        });
       }
     };
-    fetchLiveStream();
+    fetchData();
   }, []);
 
   const handleWatchLive = () => {
@@ -48,16 +87,16 @@ export const HeroSection = () => {
         <div className="max-w-4xl mx-auto">
           {/* Main Heading */}
           <h1 className="text-white mb-6 text-5xl md:text-7xl font-bold leading-tight">
-            Free Pentecostal Fellowship Church of Kenya
+            {heroSettings.heading}
           </h1>
           
           {/* Tagline */}
           <div className="mb-8">
             <p className="text-accent text-2xl md:text-3xl font-semibold mb-2">
-              Hope. Freedom. Community.
+              {heroSettings.tagline}
             </p>
             <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-              We gather to worship, heal, and serve. Join us Sundays at 9:00 AM & 11:00 AM — all are welcome.
+              {heroSettings.subtitle}
             </p>
           </div>
 
@@ -99,10 +138,10 @@ export const HeroSection = () => {
 
           {/* Next Service Info */}
           <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 max-w-md mx-auto">
-            <h3 className="text-white font-heading text-lg font-semibold mb-2">Next Service</h3>
-            <p className="text-white/90 text-sm mb-1">Sunday Worship</p>
-            <p className="text-accent font-semibold">This Sunday at 9:00 AM</p>
-            <p className="text-white/80 text-sm mt-2">Main Sanctuary • Baringo County, Kenya</p>
+            <h3 className="text-white font-heading text-lg font-semibold mb-2">{heroSettings.next_service_title}</h3>
+            <p className="text-white/90 text-sm mb-1">{heroSettings.service_name}</p>
+            <p className="text-accent font-semibold">{heroSettings.service_time}</p>
+            <p className="text-white/80 text-sm mt-2">{heroSettings.service_location}</p>
           </div>
         </div>
       </div>
