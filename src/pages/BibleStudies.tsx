@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, Download, Calendar, User, BookOpen, Search, Filter, Clock, Tag, Share2, Eye, Headphones } from "lucide-react";
+import { Play, Calendar, User, BookOpen, Search, Filter, Clock, Tag, Share2, Eye, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useVideoPlayer } from "@/contexts/VideoPlayerContext";
 import { toast } from "@/hooks/use-toast";
@@ -145,44 +145,6 @@ const BibleStudies = () => {
       toast({
         title: "Not Available",
         description: "This sermon doesn't have media available yet.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDownload = async (sermon: Sermon) => {
-    const url = sermon.video_url || sermon.audio_url;
-    if (!url) {
-      toast({
-        title: "Not Available",
-        description: "No downloadable media available for this sermon.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      // Increment download count
-      await supabase
-        .from('sermons')
-        .update({ download_count: sermon.download_count + 1 })
-        .eq('id', sermon.id);
-
-      // Open the URL in a new tab for download
-      window.open(url, '_blank');
-      
-      toast({
-        title: "Download Started",
-        description: "Your download should begin shortly.",
-      });
-
-      // Refresh sermons to update count
-      fetchSermons();
-    } catch (error) {
-      console.error('Download error:', error);
-      toast({
-        title: "Download Failed",
-        description: "There was an error starting the download.",
         variant: "destructive",
       });
     }
@@ -404,10 +366,6 @@ const BibleStudies = () => {
                             </span>
                           </div>
                         )}
-                        <div className="flex items-center space-x-2">
-                          <Download className="h-4 w-4" />
-                          <span>{sermon.download_count} downloads</span>
-                        </div>
                       </div>
 
                       {/* Tags */}
@@ -444,13 +402,6 @@ const BibleStudies = () => {
                               Listen
                             </>
                           )}
-                        </Button>
-                        <Button 
-                          onClick={() => handleDownload(sermon)}
-                          size="sm" 
-                          variant="outline"
-                        >
-                          <Download className="h-4 w-4" />
                         </Button>
                         <Button 
                           onClick={() => handleShare(sermon)}
