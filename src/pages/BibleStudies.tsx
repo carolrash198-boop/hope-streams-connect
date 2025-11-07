@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { Play, Calendar, User, BookOpen, Search, Filter, Clock, Tag, Share2, Eye, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useVideoPlayer } from "@/contexts/VideoPlayerContext";
 import { toast } from "@/hooks/use-toast";
+import { SermonPlayer } from "@/components/SermonPlayer";
 
 interface Sermon {
   id: string;
@@ -37,8 +37,8 @@ const BibleStudies = () => {
   const [filterTag, setFilterTag] = useState("all");
   const [sortBy, setSortBy] = useState("date-desc");
   const [liveStreamSettings, setLiveStreamSettings] = useState<any[]>([]);
-  const { openVideo } = useVideoPlayer();
-
+  
+  const [playingSermon, setPlayingSermon] = useState<Sermon | null>(null);
   const [allSeries, setAllSeries] = useState<string[]>([]);
   const [allPreachers, setAllPreachers] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
@@ -140,7 +140,7 @@ const BibleStudies = () => {
   const handlePlaySermon = (sermon: Sermon) => {
     const url = sermon.video_url || sermon.audio_url;
     if (url) {
-      openVideo(url, sermon.title);
+      setPlayingSermon(sermon);
     } else {
       toast({
         title: "Not Available",
@@ -148,6 +148,10 @@ const BibleStudies = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleClosePlayer = () => {
+    setPlayingSermon(null);
   };
 
   const handleShare = async (sermon: Sermon) => {
@@ -181,7 +185,15 @@ const BibleStudies = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen">
+      <div className="min-h-screen relative">
+        {/* Sermon Player */}
+        <SermonPlayer
+          videoUrl={playingSermon?.video_url || null}
+          audioUrl={playingSermon?.audio_url || null}
+          title={playingSermon?.title || ""}
+          isOpen={!!playingSermon}
+          onClose={handleClosePlayer}
+        />
         {/* Hero Section */}
         <section className="py-20 bg-gradient-to-br from-primary to-primary/80 text-white">
           <div className="container mx-auto px-4 text-center">
@@ -459,15 +471,42 @@ const BibleStudies = () => {
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       {setting.youtube_url && (
-                        <Button onClick={() => openVideo(setting.youtube_url, setting.service_name)}>
+                        <Button onClick={() => setPlayingSermon({ 
+                          id: setting.id, 
+                          title: setting.service_name, 
+                          video_url: setting.youtube_url,
+                          audio_url: null,
+                          preacher: '',
+                          date: '',
+                          series: null,
+                          scripture_passages: [],
+                          tags: [],
+                          format: 'video',
+                          duration_minutes: null,
+                          slug: '',
+                          show_notes: null
+                        } as Sermon)}>
                           Watch on YouTube
                         </Button>
                       )}
                       {setting.facebook_url && (
                         <Button 
                           variant="outline"
-                          onClick={() => openVideo(setting.facebook_url, setting.service_name)}
-                        >
+                          onClick={() => setPlayingSermon({ 
+                            id: setting.id, 
+                            title: setting.service_name, 
+                            video_url: setting.facebook_url,
+                            audio_url: null,
+                            preacher: '',
+                            date: '',
+                            series: null,
+                            scripture_passages: [],
+                            tags: [],
+                            format: 'video',
+                            duration_minutes: null,
+                            slug: '',
+                            show_notes: null
+                          } as Sermon)}>
                           Watch on Facebook
                         </Button>
                       )}
