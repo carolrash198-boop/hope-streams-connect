@@ -34,6 +34,7 @@ const Contact = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [inquiryTypeFilter, setInquiryTypeFilter] = useState("all");
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [followUpNotes, setFollowUpNotes] = useState("");
@@ -110,6 +111,16 @@ const Contact = () => {
     setViewDialogOpen(true);
   };
 
+  const inquiryTypes = [
+    "General Information",
+    "Prayer Request", 
+    "Pastoral Care",
+    "Volunteer Opportunities",
+    "Events & Programs",
+    "Church Membership",
+    "Website/Technical Issue"
+  ];
+
   const filteredSubmissions = submissions.filter(submission => {
     const matchesSearch = searchTerm === "" || 
       submission.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,8 +130,9 @@ const Contact = () => {
       submission.message.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === "all" || submission.status === statusFilter;
+    const matchesInquiryType = inquiryTypeFilter === "all" || submission.inquiry_type === inquiryTypeFilter;
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesInquiryType;
   });
 
   const getStatusIcon = (status: string) => {
@@ -157,6 +169,11 @@ const Contact = () => {
     urgent: submissions.filter(s => s.is_urgent).length,
   };
 
+  const inquiryTypeStats = inquiryTypes.map(type => ({
+    type,
+    count: submissions.filter(s => s.inquiry_type === type).length
+  }));
+
   return (
     <div className="flex min-h-screen bg-muted/10">
       <AdminSidebar />
@@ -166,42 +183,64 @@ const Contact = () => {
           <p className="text-muted-foreground">View and manage contact form submissions</p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-sm text-muted-foreground">Total</div>
-              <div className="text-2xl font-bold">{stats.total}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-sm text-muted-foreground">Pending</div>
-              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-sm text-muted-foreground">In Progress</div>
-              <div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-sm text-muted-foreground">Resolved</div>
-              <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-sm text-muted-foreground">Urgent</div>
-              <div className="text-2xl font-bold text-red-600">{stats.urgent}</div>
-            </CardContent>
-          </Card>
+        {/* Stats Cards - Status */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3 text-muted-foreground uppercase">Status Overview</h3>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-sm text-muted-foreground">Total</div>
+                <div className="text-2xl font-bold">{stats.total}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-sm text-muted-foreground">Pending</div>
+                <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-sm text-muted-foreground">In Progress</div>
+                <div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-sm text-muted-foreground">Resolved</div>
+                <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-sm text-muted-foreground">Urgent</div>
+                <div className="text-2xl font-bold text-red-600">{stats.urgent}</div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Stats Cards - Inquiry Types */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3 text-muted-foreground uppercase">Inquiry Type Breakdown</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
+            {inquiryTypeStats.map(({ type, count }) => (
+              <Card 
+                key={type} 
+                className={`cursor-pointer transition-colors ${inquiryTypeFilter === type ? 'ring-2 ring-primary' : ''}`}
+                onClick={() => setInquiryTypeFilter(inquiryTypeFilter === type ? 'all' : type)}
+              >
+                <CardContent className="p-4">
+                  <div className="text-xs text-muted-foreground mb-1 line-clamp-2">{type}</div>
+                  <div className="text-xl font-bold">{count}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -222,7 +261,50 @@ const Contact = () => {
               <SelectItem value="resolved">Resolved</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={inquiryTypeFilter} onValueChange={setInquiryTypeFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by inquiry type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Inquiry Types</SelectItem>
+              {inquiryTypes.map(type => (
+                <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+
+        {/* Active Filters Display */}
+        {(inquiryTypeFilter !== "all" || statusFilter !== "all" || searchTerm) && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {inquiryTypeFilter !== "all" && (
+              <Badge variant="secondary" className="cursor-pointer" onClick={() => setInquiryTypeFilter("all")}>
+                Type: {inquiryTypeFilter} ×
+              </Badge>
+            )}
+            {statusFilter !== "all" && (
+              <Badge variant="secondary" className="cursor-pointer" onClick={() => setStatusFilter("all")}>
+                Status: {statusFilter.replace('_', ' ')} ×
+              </Badge>
+            )}
+            {searchTerm && (
+              <Badge variant="secondary" className="cursor-pointer" onClick={() => setSearchTerm("")}>
+                Search: "{searchTerm}" ×
+              </Badge>
+            )}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => {
+                setInquiryTypeFilter("all");
+                setStatusFilter("all");
+                setSearchTerm("");
+              }}
+            >
+              Clear all filters
+            </Button>
+          </div>
+        )}
 
         {/* Results count */}
         <div className="mb-4 text-sm text-muted-foreground">
