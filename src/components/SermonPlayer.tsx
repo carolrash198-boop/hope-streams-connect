@@ -22,6 +22,22 @@ export const SermonPlayer = ({ videoUrl, audioUrl, title, isOpen, onClose }: Ser
 
   const mediaUrl = videoUrl || audioUrl;
   const isVideo = !!videoUrl;
+  
+  // Check if URL is YouTube or needs iframe
+  const isYouTube = mediaUrl?.includes('youtube.com') || mediaUrl?.includes('youtu.be');
+  const isFacebook = mediaUrl?.includes('facebook.com');
+  const needsIframe = isYouTube || isFacebook;
+  
+  const getEmbedUrl = (url: string) => {
+    if (isYouTube) {
+      const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
+      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
+    }
+    if (isFacebook) {
+      return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&autoplay=1`;
+    }
+    return url;
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -71,13 +87,22 @@ export const SermonPlayer = ({ videoUrl, audioUrl, title, isOpen, onClose }: Ser
       {/* Media Player */}
       <div className="bg-black flex items-center justify-center" style={{ height: isMaximized ? 'calc(100% - 52px)' : size.height - 52 }}>
         {isVideo ? (
-          <video
-            src={mediaUrl}
-            controls
-            autoPlay
-            className="w-full h-full"
-            style={{ maxHeight: '100%', objectFit: 'contain' }}
-          />
+          needsIframe ? (
+            <iframe
+              src={getEmbedUrl(mediaUrl)}
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <video
+              src={mediaUrl}
+              controls
+              autoPlay
+              className="w-full h-full"
+              style={{ maxHeight: '100%', objectFit: 'contain' }}
+            />
+          )
         ) : (
           <div className="w-full h-full flex items-center justify-center p-8">
             <audio src={mediaUrl} controls autoPlay className="w-full max-w-md" />
