@@ -980,6 +980,57 @@ export type Database = {
         }
         Relationships: []
       }
+      volunteer_submissions: {
+        Row: {
+          areas_of_interest: string[]
+          availability: string
+          created_at: string | null
+          email: string
+          first_name: string
+          follow_up_notes: string | null
+          id: string
+          last_name: string
+          message: string | null
+          phone: string | null
+          skills: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          areas_of_interest: string[]
+          availability: string
+          created_at?: string | null
+          email: string
+          first_name: string
+          follow_up_notes?: string | null
+          id?: string
+          last_name: string
+          message?: string | null
+          phone?: string | null
+          skills?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          areas_of_interest?: string[]
+          availability?: string
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          follow_up_notes?: string | null
+          id?: string
+          last_name?: string
+          message?: string | null
+          phone?: string | null
+          skills?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

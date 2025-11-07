@@ -4,9 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, Users, Home, Utensils, GraduationCap, Globe, Calendar, MapPin, Clock, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import * as LucideIcons from "lucide-react";
 
 interface OutreachProject {
@@ -27,6 +34,29 @@ const Outreach = () => {
   const [impactStories, setImpactStories] = useState<OutreachProject[]>([]);
   const [volunteerOpportunities, setVolunteerOpportunities] = useState<OutreachProject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [volunteerDialogOpen, setVolunteerDialogOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    areas_of_interest: [] as string[],
+    availability: "",
+    message: "",
+    skills: ""
+  });
+
+  const areaOptions = [
+    "Food Bank",
+    "Homeless Shelter",
+    "Affordable Housing",
+    "Youth Programs",
+    "Community Events",
+    "Administrative Support",
+    "Other"
+  ];
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -53,6 +83,50 @@ const Outreach = () => {
     fetchProjects();
   }, []);
 
+  const handleVolunteerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error } = await supabase
+        .from("volunteer_submissions")
+        .insert([{
+          ...formData,
+          user_id: user?.id || null
+        }]);
+
+      if (error) throw error;
+
+      toast.success("Thank you for volunteering! We'll be in touch soon.");
+      setVolunteerDialogOpen(false);
+      setFormData({
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone: "",
+        areas_of_interest: [],
+        availability: "",
+        message: "",
+        skills: ""
+      });
+    } catch (error: any) {
+      toast.error("Failed to submit: " + error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const toggleAreaOfInterest = (area: string) => {
+    setFormData(prev => ({
+      ...prev,
+      areas_of_interest: prev.areas_of_interest.includes(area)
+        ? prev.areas_of_interest.filter(a => a !== area)
+        : [...prev.areas_of_interest, area]
+    }));
+  };
+
   const getIcon = (iconName: string) => {
     const Icon = (LucideIcons as any)[iconName];
     return Icon || Heart;
@@ -70,8 +144,12 @@ const Outreach = () => {
               support, and hope in our community and around the world.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" variant="secondary">
-                <Link to="#volunteer">Volunteer Today</Link>
+              <Button 
+                size="lg" 
+                variant="secondary"
+                onClick={() => setVolunteerDialogOpen(true)}
+              >
+                Volunteer Today
               </Button>
               <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60">
                 <Link to="/donate">Support Our Mission</Link>
@@ -278,8 +356,8 @@ const Outreach = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild>
-                  <Link to="/contact">Volunteer Application</Link>
+                <Button onClick={() => setVolunteerDialogOpen(true)}>
+                  Volunteer Application
                 </Button>
                 <Button asChild variant="outline">
                   <a href="tel:+1234567890">Call (123) 456-7890</a>
@@ -341,6 +419,120 @@ const Outreach = () => {
             </div>
           </div>
         </section>
+
+        {/* Volunteer Dialog */}
+        <Dialog open={volunteerDialogOpen} onOpenChange={setVolunteerDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Volunteer Today</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleVolunteerSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="first_name">First Name *</Label>
+                  <Input
+                    id="first_name"
+                    value={formData.first_name}
+                    onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="last_name">Last Name *</Label>
+                  <Input
+                    id="last_name"
+                    value={formData.last_name}
+                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label>Areas of Interest *</Label>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {areaOptions.map((area) => (
+                    <div key={area} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={area}
+                        checked={formData.areas_of_interest.includes(area)}
+                        onCheckedChange={() => toggleAreaOfInterest(area)}
+                      />
+                      <label htmlFor={area} className="text-sm cursor-pointer">
+                        {area}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="availability">Availability *</Label>
+                <Select
+                  value={formData.availability}
+                  onValueChange={(value) => setFormData({ ...formData, availability: value })}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your availability" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weekdays">Weekdays</SelectItem>
+                    <SelectItem value="weekends">Weekends</SelectItem>
+                    <SelectItem value="flexible">Flexible</SelectItem>
+                    <SelectItem value="monthly">Once a month</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="skills">Skills & Experience</Label>
+                <Input
+                  id="skills"
+                  value={formData.skills}
+                  onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                  placeholder="e.g., Teaching, Cooking, Construction"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="Tell us why you want to volunteer..."
+                  rows={4}
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={submitting || formData.areas_of_interest.length === 0}>
+                {submitting ? "Submitting..." : "Submit Volunteer Application"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );

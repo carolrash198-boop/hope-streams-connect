@@ -9,6 +9,7 @@ const navigation = [
   { name: "Sermons", icon: FileText, path: "/admin/sermons" },
   { name: "Live Stream", icon: Video, path: "/admin/live-stream" },
   { name: "Outreach", icon: HandHeart, path: "/admin/outreach" },
+  { name: "Volunteers", icon: Users, path: "/admin/volunteers" },
   { name: "Sunday School", icon: GraduationCap, path: "/admin/sunday-school" },
   { name: "SS Content", icon: BookMarked, path: "/admin/sunday-school-content" },
   { name: "Class Visits", icon: UserCheck, path: "/admin/class-visits" },
