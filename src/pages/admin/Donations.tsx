@@ -48,6 +48,19 @@ const Donations = () => {
   };
 
   const handleVerifyDonation = async (id: string, status: 'verified' | 'rejected') => {
+    // Get donation details first
+    const { data: donation, error: fetchError } = await supabase
+      .from("donations")
+      .select("amount, campaign_id")
+      .eq("id", id)
+      .single();
+
+    if (fetchError) {
+      toast.error("Failed to fetch donation details");
+      return;
+    }
+
+    // Update donation status
     const { error } = await supabase
       .from("donations")
       .update({ verification_status: status })
@@ -56,6 +69,24 @@ const Donations = () => {
     if (error) {
       toast.error("Failed to update donation status");
       return;
+    }
+
+    // If verified and donation is for a campaign, update campaign progress
+    if (status === "verified" && donation.campaign_id) {
+      const { data: campaign, error: campaignFetchError } = await supabase
+        .from("campaigns")
+        .select("current_amount")
+        .eq("id", donation.campaign_id)
+        .single();
+
+      if (!campaignFetchError && campaign) {
+        const newAmount = campaign.current_amount + donation.amount;
+        
+        await supabase
+          .from("campaigns")
+          .update({ current_amount: newAmount })
+          .eq("id", donation.campaign_id);
+      }
     }
 
     toast.success(`Donation ${status} successfully`);
