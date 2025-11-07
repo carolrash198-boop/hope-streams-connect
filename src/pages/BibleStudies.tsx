@@ -32,6 +32,7 @@ const BibleStudies = () => {
   const [filterPreacher, setFilterPreacher] = useState("all");
   const [filterTag, setFilterTag] = useState("all");
   const [sortBy, setSortBy] = useState("date-desc");
+  const [liveStreamSettings, setLiveStreamSettings] = useState<any[]>([]);
 
   const [allSeries, setAllSeries] = useState<string[]>([]);
   const [allPreachers, setAllPreachers] = useState<string[]>([]);
@@ -39,7 +40,20 @@ const BibleStudies = () => {
 
   useEffect(() => {
     fetchSermons();
+    fetchLiveStreamSettings();
   }, []);
+
+  const fetchLiveStreamSettings = async () => {
+    const { data, error } = await supabase
+      .from('live_stream_settings')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
+
+    if (!error && data) {
+      setLiveStreamSettings(data);
+    }
+  };
 
   const fetchSermons = async () => {
     try {
@@ -353,50 +367,62 @@ const BibleStudies = () => {
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="mb-6">Join Us Live</h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Can't make it to church in person? Join our live stream every Sunday morning 
+                Can't make it to church in person? Join our live stream 
                 and be part of our worship experience from anywhere.
               </p>
 
-              <div className="bg-white rounded-2xl p-8 shadow-sm border">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                  <div>
-                    <h3 className="font-semibold mb-4 flex items-center">
-                      <Clock className="h-5 w-5 mr-2 text-accent" />
-                      Service Times
-                    </h3>
-                    <div className="space-y-2 text-sm">
-                      <p><span className="font-medium">Morning Service:</span> 9:00 AM</p>
-                      <p><span className="font-medium">Contemporary Service:</span> 11:00 AM</p>
-                      <p><span className="font-medium">Wednesday Bible Study:</span> 7:00 PM</p>
+              <div className="space-y-6">
+                {liveStreamSettings.map((setting) => (
+                  <div key={setting.id} className="bg-white rounded-2xl p-8 shadow-sm border">
+                    <h3 className="text-2xl font-bold mb-2">{setting.service_name}</h3>
+                    <p className="text-muted-foreground mb-6">{setting.service_time}</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                      <div>
+                        <h4 className="font-semibold mb-4 flex items-center justify-center md:justify-start">
+                          <Clock className="h-5 w-5 mr-2 text-accent" />
+                          Service Time
+                        </h4>
+                        <p className="text-sm">{setting.service_time}</p>
+                      </div>
+
+                      <div>
+                        <h4 className="font-semibold mb-4 flex items-center justify-center md:justify-start">
+                          <BookOpen className="h-5 w-5 mr-2 text-accent" />
+                          {setting.how_to_watch_title}
+                        </h4>
+                        <div className="space-y-2 text-sm text-left">
+                          {setting.how_to_watch_steps?.map((step: string, index: number) => (
+                            <p key={index}>• {step}</p>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      {setting.youtube_url && (
+                        <Button asChild>
+                          <a href={setting.youtube_url} target="_blank" rel="noopener noreferrer">
+                            Watch on YouTube
+                          </a>
+                        </Button>
+                      )}
+                      {setting.facebook_url && (
+                        <Button asChild variant="outline">
+                          <a href={setting.facebook_url} target="_blank" rel="noopener noreferrer">
+                            Watch on Facebook
+                          </a>
+                        </Button>
+                      )}
                     </div>
                   </div>
+                ))}
 
-                  <div>
-                    <h3 className="font-semibold mb-4 flex items-center">
-                      <BookOpen className="h-5 w-5 mr-2 text-accent" />
-                      How to Watch
-                    </h3>
-                    <div className="space-y-2 text-sm">
-                      <p>• YouTube Live Stream</p>
-                      <p>• Facebook Live</p>
-                      <p>• Church Website</p>
-                      <p>• Mobile App</p>
-                    </div>
+                {liveStreamSettings.length === 0 && (
+                  <div className="bg-white rounded-2xl p-8 shadow-sm border">
+                    <p className="text-muted-foreground">No live stream services are currently scheduled.</p>
                   </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button asChild>
-                    <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
-                      Watch on YouTube
-                    </a>
-                  </Button>
-                  <Button asChild variant="outline">
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                      Watch on Facebook
-                    </a>
-                  </Button>
-                </div>
+                )}
               </div>
             </div>
           </div>

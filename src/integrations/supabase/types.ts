@@ -515,6 +515,51 @@ export type Database = {
         }
         Relationships: []
       }
+      live_stream_settings: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          display_order: number | null
+          facebook_url: string | null
+          how_to_watch_steps: string[]
+          how_to_watch_title: string
+          id: string
+          is_active: boolean | null
+          service_name: string
+          service_time: string
+          updated_at: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          facebook_url?: string | null
+          how_to_watch_steps?: string[]
+          how_to_watch_title?: string
+          id?: string
+          is_active?: boolean | null
+          service_name: string
+          service_time: string
+          updated_at?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          facebook_url?: string | null
+          how_to_watch_steps?: string[]
+          how_to_watch_title?: string
+          id?: string
+          is_active?: boolean | null
+          service_name?: string
+          service_time?: string
+          updated_at?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       prayer_requests: {
         Row: {
           created_at: string | null

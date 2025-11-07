@@ -16,6 +16,7 @@ import AdminAuth from "./pages/admin/Auth";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminEvents from "./pages/admin/Events";
 import AdminSermons from "./pages/admin/Sermons";
+import AdminLiveStream from "./pages/admin/LiveStream";
 import AdminContact from "./pages/admin/Contact";
 import AdminGallery from "./pages/admin/Gallery";
 import AdminPrayers from "./pages/admin/Prayers";
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/admin/services" element={<AdminServices />} />
           <Route path="/admin/events" element={<AdminEvents />} />
           <Route path="/admin/sermons" element={<AdminSermons />} />
+          <Route path="/admin/live-stream" element={<AdminLiveStream />} />
           <Route path="/admin/contact" element={<AdminContact />} />
           <Route path="/admin/gallery" element={<AdminGallery />} />
           <Route path="/admin/prayers" element={<AdminPrayers />} />
