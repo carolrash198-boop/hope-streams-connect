@@ -2,6 +2,7 @@ import { useVideoPlayer } from '@/contexts/VideoPlayerContext';
 import { X, Maximize2, Minimize2, Square } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
+import Draggable from 'react-draggable';
 
 const getEmbedUrl = (url: string) => {
   // YouTube
@@ -36,18 +37,23 @@ export const VideoPlayerModal = () => {
       )}
 
       {/* Video Player Container */}
-      <div
-        className={cn(
-          "fixed z-50 transition-all duration-300",
-          isMinimized
-            ? "bottom-4 right-4 w-80 h-48 shadow-2xl"
-            : isFloating
-            ? "bottom-4 right-4 w-96 h-64 md:w-[500px] md:h-[320px] shadow-2xl"
-            : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] h-[85vh] md:w-[90vw] md:h-[80vh] max-w-6xl"
-        )}
+      <Draggable
+        disabled={!isFloating && !isMinimized}
+        handle=".drag-handle"
+        bounds="parent"
       >
+        <div
+          className={cn(
+            "fixed z-50 transition-all duration-300",
+            isMinimized
+              ? "bottom-4 right-4 w-80 h-48 shadow-2xl"
+              : isFloating
+              ? "bottom-4 right-4 w-96 h-64 md:w-[500px] md:h-[320px] shadow-2xl"
+              : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] h-[85vh] md:w-[90vw] md:h-[80vh] max-w-6xl"
+          )}
+        >
         {/* Header */}
-        <div className="bg-background border border-border rounded-t-lg p-3 flex items-center justify-between">
+        <div className="bg-background border border-border rounded-t-lg p-3 flex items-center justify-between drag-handle cursor-move">
           <h3 className="text-sm font-semibold text-foreground truncate flex-1">
             {videoTitle || 'Live Stream'}
           </h3>
@@ -103,7 +109,8 @@ export const VideoPlayerModal = () => {
             title={videoTitle || 'Live Stream'}
           />
         </div>
-      </div>
+        </div>
+      </Draggable>
     </>
   );
 };
