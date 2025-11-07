@@ -560,6 +560,60 @@ export type Database = {
         }
         Relationships: []
       }
+      outreach_projects: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string
+          display_order: number | null
+          icon_name: string
+          id: string
+          impact_metric: string | null
+          is_active: boolean | null
+          is_urgent: boolean | null
+          location: string | null
+          project_type: string
+          schedule: string | null
+          title: string
+          updated_at: string | null
+          volunteers_needed: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description: string
+          display_order?: number | null
+          icon_name: string
+          id?: string
+          impact_metric?: string | null
+          is_active?: boolean | null
+          is_urgent?: boolean | null
+          location?: string | null
+          project_type?: string
+          schedule?: string | null
+          title: string
+          updated_at?: string | null
+          volunteers_needed?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string
+          display_order?: number | null
+          icon_name?: string
+          id?: string
+          impact_metric?: string | null
+          is_active?: boolean | null
+          is_urgent?: boolean | null
+          location?: string | null
+          project_type?: string
+          schedule?: string | null
+          title?: string
+          updated_at?: string | null
+          volunteers_needed?: string | null
+        }
+        Relationships: []
+      }
       prayer_requests: {
         Row: {
           created_at: string | null

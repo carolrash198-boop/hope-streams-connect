@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,111 +6,57 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Heart, Users, Home, Utensils, GraduationCap, Globe, Calendar, MapPin, Clock, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import * as LucideIcons from "lucide-react";
+
+interface OutreachProject {
+  id: string;
+  title: string;
+  description: string;
+  icon_name: string;
+  impact_metric: string | null;
+  schedule: string | null;
+  volunteers_needed: string | null;
+  location: string | null;
+  is_urgent: boolean;
+  project_type: string;
+}
 
 const Outreach = () => {
-  const currentProjects = [
-    {
-      title: "Community Food Bank",
-      icon: Utensils,
-      description: "Providing groceries and hot meals to families in need throughout our community.",
-      impact: "2,400 meals served this year",
-      frequency: "Every Saturday, 10 AM - 2 PM",
-      volunteers: "15-20 volunteers needed weekly",
-      location: "Church Fellowship Hall",
-      urgentNeed: true
-    },
-    {
-      title: "Homeless Shelter Support", 
-      icon: Home,
-      description: "Monthly dinners and care packages for residents at Hope Valley Shelter.",
-      impact: "180 residents served monthly",
-      frequency: "Third Saturday of each month",
-      volunteers: "8-12 volunteers needed monthly",
-      location: "Hope Valley Shelter",
-      urgentNeed: false
-    },
-    {
-      title: "After School Tutoring",
-      icon: GraduationCap, 
-      description: "Free tutoring and mentorship for elementary students in our neighborhood.",
-      impact: "25 students helped weekly",
-      frequency: "Tuesdays & Thursdays, 3-5 PM",
-      volunteers: "5-8 tutors needed",
-      location: "Lincoln Elementary School",
-      urgentNeed: true
-    },
-    {
-      title: "Senior Care Ministry",
-      icon: Heart,
-      description: "Visits, grocery shopping, and companionship for elderly community members.",
-      impact: "40 seniors supported regularly",
-      frequency: "Ongoing, flexible scheduling",
-      volunteers: "Always accepting new volunteers",
-      location: "Various homes & care facilities",
-      urgentNeed: false
-    },
-    {
-      title: "International Missions",
-      icon: Globe,
-      description: "Supporting missionaries and funding clean water projects in developing countries.",
-      impact: "3 wells funded, 4 missionaries supported",
-      frequency: "Ongoing financial support",
-      volunteers: "Prayer team and fundraising help",
-      location: "Guatemala, Kenya, Philippines",
-      urgentNeed: false
-    }
-  ];
+  const [currentProjects, setCurrentProjects] = useState<OutreachProject[]>([]);
+  const [impactStories, setImpactStories] = useState<OutreachProject[]>([]);
+  const [volunteerOpportunities, setVolunteerOpportunities] = useState<OutreachProject[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const impactStories = [
-    {
-      title: "Maria's New Beginning", 
-      category: "Food Bank",
-      story: "After losing her job during the pandemic, Maria struggled to feed her three children. Our food bank provided groceries for six months while she found new employment. Today, she volunteers with us every weekend.",
-      outcome: "Now employed and giving back",
-      image: "/placeholder-impact-1.jpg"
-    },
-    {
-      title: "Tommy's Academic Success",
-      category: "Tutoring Program", 
-      story: "Tommy was failing math when he joined our after-school program. With consistent tutoring and mentorship, he raised his grade from F to B+ and gained confidence in all subjects.",
-      outcome: "Honor roll student for 2 semesters",
-      image: "/placeholder-impact-2.jpg"
-    },
-    {
-      title: "Clean Water in Kenya",
-      category: "International Missions",
-      story: "Our church raised $15,000 to build a well in rural Kenya, providing clean water to over 500 people. The community now has access to safe drinking water for the first time.",
-      outcome: "500+ people with clean water access",
-      image: "/placeholder-impact-3.jpg"
-    }
-  ];
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("outreach_projects")
+          .select("*")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true });
 
-  const volunteerOpportunities = [
-    {
-      role: "Food Bank Coordinator",
-      commitment: "4 hours/week",
-      skills: "Organization, people skills",
-      description: "Help organize food distribution and coordinate with local suppliers."
-    },
-    {
-      role: "Tutor/Mentor", 
-      commitment: "2 hours/week",
-      skills: "Patience, elementary education background helpful",
-      description: "Work one-on-one with students on homework and reading skills."
-    },
-    {
-      role: "Senior Companion",
-      commitment: "2-3 hours/week",
-      skills: "Compassion, good listener",
-      description: "Visit elderly community members for conversation and light assistance."
-    },
-    {
-      role: "Event Volunteer",
-      commitment: "Flexible",
-      skills: "Varies by event",
-      description: "Help with special outreach events, setup, cleanup, and logistics."
-    }
-  ];
+        if (error) throw error;
+
+        const projects = data || [];
+        setCurrentProjects(projects.filter(p => p.project_type === "current_project"));
+        setImpactStories(projects.filter(p => p.project_type === "impact_story"));
+        setVolunteerOpportunities(projects.filter(p => p.project_type === "volunteer_opportunity"));
+      } catch (error) {
+        console.error("Error fetching outreach projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const getIcon = (iconName: string) => {
+    const Icon = (LucideIcons as any)[iconName];
+    return Icon || Heart;
+  };
 
   return (
     <Layout>
@@ -143,57 +90,69 @@ const Outreach = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentProjects.map((project, index) => {
-                const Icon = project.icon;
-                return (
-                  <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <Icon className="h-8 w-8 text-accent" />
-                        {project.urgentNeed && (
-                          <Badge variant="destructive" className="text-xs">
-                            Urgent Need
-                          </Badge>
-                        )}
-                      </div>
-                      <CardTitle className="text-lg">{project.title}</CardTitle>
-                    </CardHeader>
-                    
-                    <CardContent className="space-y-4">
-                      <p className="text-sm text-muted-foreground">
-                        {project.description}
-                      </p>
+            {loading ? (
+              <p className="text-center">Loading projects...</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {currentProjects.map((project) => {
+                  const Icon = getIcon(project.icon_name);
+                  return (
+                    <Card key={project.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <Icon className="h-8 w-8 text-accent" />
+                          {project.is_urgent && (
+                            <Badge variant="destructive" className="text-xs">
+                              Urgent Need
+                            </Badge>
+                          )}
+                        </div>
+                        <CardTitle className="text-lg">{project.title}</CardTitle>
+                      </CardHeader>
                       
-                      <div className="space-y-2 text-xs">
-                        <div className="flex items-center space-x-2">
-                          <Heart className="h-3 w-3 text-accent" />
-                          <span className="font-medium text-accent">{project.impact}</span>
+                      <CardContent className="space-y-4">
+                        <p className="text-sm text-muted-foreground">
+                          {project.description}
+                        </p>
+                        
+                        <div className="space-y-2 text-xs">
+                          {project.impact_metric && (
+                            <div className="flex items-center space-x-2">
+                              <Heart className="h-3 w-3 text-accent" />
+                              <span className="font-medium text-accent">{project.impact_metric}</span>
+                            </div>
+                          )}
+                          {project.schedule && (
+                            <div className="flex items-center space-x-2">
+                              <Clock className="h-3 w-3 text-muted-foreground" />
+                              <span>{project.schedule}</span>
+                            </div>
+                          )}
+                          {project.volunteers_needed && (
+                            <div className="flex items-center space-x-2">
+                              <Users className="h-3 w-3 text-muted-foreground" />
+                              <span>{project.volunteers_needed}</span>
+                            </div>
+                          )}
+                          {project.location && (
+                            <div className="flex items-center space-x-2">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              <span>{project.location}</span>
+                            </div>
+                          )}
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Clock className="h-3 w-3 text-muted-foreground" />
-                          <span>{project.frequency}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Users className="h-3 w-3 text-muted-foreground" />
-                          <span>{project.volunteers}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="h-3 w-3 text-muted-foreground" />
-                          <span>{project.location}</span>
-                        </div>
-                      </div>
-                      
-                      <Button asChild variant="outline" size="sm" className="w-full">
-                        <Link to="#volunteer">
-                          Join This Project
-                        </Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                        
+                        <Button asChild variant="outline" size="sm" className="w-full">
+                          <Link to="#volunteer">
+                            Join This Project
+                          </Link>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
 
@@ -207,31 +166,35 @@ const Outreach = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {impactStories.map((story, index) => (
-                <Card key={index} className="overflow-hidden">
-                  <div className="aspect-video bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">
-                    <Heart className="h-12 w-12 text-accent" />
-                  </div>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold">{story.title}</h3>
-                      <Badge variant="outline" className="text-xs">
-                        {story.category}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-4">
-                      {story.story}
-                    </p>
-                    <div className="bg-accent/10 rounded-lg p-3">
-                      <p className="text-xs font-medium text-accent">
-                        Outcome: {story.outcome}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {loading ? (
+              <p className="text-center">Loading stories...</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {impactStories.map((story) => {
+                  const Icon = getIcon(story.icon_name);
+                  return (
+                    <Card key={story.id} className="overflow-hidden">
+                      <div className="aspect-video bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">
+                        <Icon className="h-12 w-12 text-accent" />
+                      </div>
+                      <CardContent className="p-6">
+                        <h3 className="font-semibold mb-3">{story.title}</h3>
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-4">
+                          {story.description}
+                        </p>
+                        {story.impact_metric && (
+                          <div className="bg-accent/10 rounded-lg p-3">
+                            <p className="text-xs font-medium text-accent">
+                              Outcome: {story.impact_metric}
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
 
             <div className="text-center mt-12">
               <Button asChild variant="outline">
@@ -254,32 +217,39 @@ const Outreach = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
-              {volunteerOpportunities.map((opportunity, index) => (
-                <Card key={index}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="font-semibold mb-1">{opportunity.role}</h3>
-                        <div className="text-sm text-muted-foreground space-y-1">
-                          <p><span className="font-medium">Time:</span> {opportunity.commitment}</p>
-                          <p><span className="font-medium">Skills:</span> {opportunity.skills}</p>
+            {loading ? (
+              <p className="text-center">Loading opportunities...</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+                {volunteerOpportunities.map((opportunity) => {
+                  const Icon = getIcon(opportunity.icon_name);
+                  return (
+                    <Card key={opportunity.id}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <h3 className="font-semibold mb-1">{opportunity.title}</h3>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                              {opportunity.schedule && <p><span className="font-medium">Time:</span> {opportunity.schedule}</p>}
+                              {opportunity.volunteers_needed && <p><span className="font-medium">Skills:</span> {opportunity.volunteers_needed}</p>}
+                            </div>
+                          </div>
+                          <Icon className="h-6 w-6 text-accent" />
                         </div>
-                      </div>
-                      <UserPlus className="h-6 w-6 text-accent" />
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {opportunity.description}
-                    </p>
-                    <Button asChild variant="outline" size="sm" className="w-full">
-                      <Link to="/contact">
-                        Apply for This Role
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          {opportunity.description}
+                        </p>
+                        <Button asChild variant="outline" size="sm" className="w-full">
+                          <Link to="/contact">
+                            Apply for This Role
+                          </Link>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Volunteer Sign-up CTA */}
             <div className="bg-accent/10 rounded-2xl p-8 text-center max-w-2xl mx-auto">

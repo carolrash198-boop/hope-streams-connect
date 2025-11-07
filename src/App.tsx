@@ -27,6 +27,7 @@ import AdminSundaySchool from "./pages/admin/SundaySchool";
 import AdminClassVisits from "./pages/admin/ClassVisits";
 import AdminServices from "./pages/admin/Services";
 import AdminSundaySchoolContent from "./pages/admin/SundaySchoolContent";
+import AdminOutreach from "./pages/admin/Outreach";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/admin/events" element={<AdminEvents />} />
           <Route path="/admin/sermons" element={<AdminSermons />} />
           <Route path="/admin/live-stream" element={<AdminLiveStream />} />
+          <Route path="/admin/outreach" element={<AdminOutreach />} />
           <Route path="/admin/contact" element={<AdminContact />} />
           <Route path="/admin/gallery" element={<AdminGallery />} />
           <Route path="/admin/prayers" element={<AdminPrayers />} />
