@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Pagination,
   PaginationContent,
@@ -17,7 +18,17 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { toast } from "sonner";
-import { Users as UsersIcon, Shield, UserPlus, Search, Mail, Phone, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Users as UsersIcon, Shield, UserPlus, Search, Mail, Phone, Calendar, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UserProfile {
   id: string;
@@ -47,6 +58,17 @@ const Users = () => {
     members: 0,
     recent: 0
   });
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    first_name: "",
+    last_name: "",
+    phone: ""
+  });
 
   useEffect(() => {
     fetchProfiles();
@@ -55,10 +77,31 @@ const Users = () => {
   const fetchProfiles = async () => {
     setLoading(true);
     try {
-      // Fetch all users from auth.users via admin API
-      const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please login to view users");
+        return;
+      }
 
-      if (usersError) throw usersError;
+      // Call edge function to fetch users
+      const response = await fetch(
+        `https://ueepzqmjueozyhbjcrzq.supabase.co/functions/v1/manage-users`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ action: 'list' }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to fetch users');
+      }
+
+      const { users } = await response.json();
 
       // Fetch profiles
       const { data: profilesData, error: profilesError } = await supabase
@@ -75,7 +118,7 @@ const Users = () => {
       if (rolesError) throw rolesError;
 
       // Combine auth users with profiles and roles
-      const usersWithRoles = (users || []).map(user => {
+      const usersWithRoles = (users || []).map((user: any) => {
         const profile = profilesData?.find(p => p.user_id === user.id);
         const userRoles = (rolesData || [])
           .filter(r => r.user_id === user.id)
@@ -155,6 +198,129 @@ const Users = () => {
       fetchProfiles();
     } catch (error: any) {
       toast.error("Failed to remove role: " + error.message);
+    }
+  };
+
+  const handleCreateUser = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please login to create users");
+        return;
+      }
+
+      const response = await fetch(
+        `https://ueepzqmjueozyhbjcrzq.supabase.co/functions/v1/manage-users`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            action: 'create',
+            userData: formData
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create user');
+      }
+
+      toast.success("User created successfully");
+      setCreateDialogOpen(false);
+      setFormData({ email: "", password: "", first_name: "", last_name: "", phone: "" });
+      fetchProfiles();
+    } catch (error: any) {
+      toast.error("Failed to create user: " + error.message);
+    }
+  };
+
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please login to update users");
+        return;
+      }
+
+      const response = await fetch(
+        `https://ueepzqmjueozyhbjcrzq.supabase.co/functions/v1/manage-users`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            action: 'update',
+            userId: selectedUser.user_id,
+            userData: {
+              email: formData.email,
+              user_metadata: {
+                first_name: formData.first_name,
+                last_name: formData.last_name
+              },
+              phone: formData.phone || undefined
+            }
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to update user');
+      }
+
+      toast.success("User updated successfully");
+      setEditDialogOpen(false);
+      setSelectedUser(null);
+      fetchProfiles();
+    } catch (error: any) {
+      toast.error("Failed to update user: " + error.message);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please login to delete users");
+        return;
+      }
+
+      const response = await fetch(
+        `https://ueepzqmjueozyhbjcrzq.supabase.co/functions/v1/manage-users`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            action: 'delete',
+            userId: userToDelete.user_id
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete user');
+      }
+
+      toast.success("User deleted successfully");
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+      fetchProfiles();
+    } catch (error: any) {
+      toast.error("Failed to delete user: " + error.message);
     }
   };
 
@@ -247,9 +413,15 @@ const Users = () => {
 
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Users Management</h1>
-        <p className="text-muted-foreground">View all registered users</p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold">Users Management</h1>
+          <p className="text-muted-foreground">View all registered users</p>
+        </div>
+        <Button onClick={() => setCreateDialogOpen(true)}>
+          <UserPlus className="h-4 w-4 mr-2" />
+          Add User
+        </Button>
       </div>
 
       {/* Statistics Cards */}
@@ -384,7 +556,25 @@ const Users = () => {
                   </div>
                 </div>
 
-                <div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedUser(profile);
+                      setFormData({
+                        email: profile.email || "",
+                        password: "",
+                        first_name: profile.first_name || "",
+                        last_name: profile.last_name || "",
+                        phone: profile.phone || ""
+                      });
+                      setEditDialogOpen(true);
+                    }}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"
@@ -394,7 +584,19 @@ const Users = () => {
                     }}
                   >
                     <Shield className="h-4 w-4 mr-2" />
-                    Manage Roles
+                    Roles
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => {
+                      setUserToDelete(profile);
+                      setDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
                   </Button>
                 </div>
               </div>
@@ -511,6 +713,139 @@ const Users = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Create User Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="create-email">Email *</Label>
+              <Input
+                id="create-email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="user@example.com"
+              />
+            </div>
+            <div>
+              <Label htmlFor="create-password">Password *</Label>
+              <Input
+                id="create-password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Enter password"
+              />
+            </div>
+            <div>
+              <Label htmlFor="create-first-name">First Name</Label>
+              <Input
+                id="create-first-name"
+                value={formData.first_name}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                placeholder="John"
+              />
+            </div>
+            <div>
+              <Label htmlFor="create-last-name">Last Name</Label>
+              <Input
+                id="create-last-name"
+                value={formData.last_name}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                placeholder="Doe"
+              />
+            </div>
+            <div>
+              <Label htmlFor="create-phone">Phone</Label>
+              <Input
+                id="create-phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+254 712 345 678"
+              />
+            </div>
+            <Button onClick={handleCreateUser} className="w-full">
+              Create User
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-email">Email *</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="user@example.com"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-first-name">First Name</Label>
+              <Input
+                id="edit-first-name"
+                value={formData.first_name}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                placeholder="John"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-last-name">Last Name</Label>
+              <Input
+                id="edit-last-name"
+                value={formData.last_name}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                placeholder="Doe"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-phone">Phone</Label>
+              <Input
+                id="edit-phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+254 712 345 678"
+              />
+            </div>
+            <Button onClick={handleUpdateUser} className="w-full">
+              Update User
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the user account for {userToDelete?.first_name} {userToDelete?.last_name} ({userToDelete?.email}). 
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUser} className="bg-destructive hover:bg-destructive/90">
+              Delete User
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
