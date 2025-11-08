@@ -691,6 +691,30 @@ export type Database = {
         }
         Relationships: []
       }
+      exchange_rates: {
+        Row: {
+          created_at: string
+          currency_code: string
+          id: string
+          rate_to_kes: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency_code: string
+          id?: string
+          rate_to_kes: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency_code?: string
+          id?: string
+          rate_to_kes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       footer_settings: {
         Row: {
           about_text: string
@@ -1371,6 +1395,54 @@ export type Database = {
           name?: string
           photo_url?: string | null
           role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tithes: {
+        Row: {
+          amount: number
+          amount_in_kes: number
+          church_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          member_id: string | null
+          notes: string | null
+          payment_date: string
+          payment_method: string | null
+          transaction_reference: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          amount_in_kes: number
+          church_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string | null
+          transaction_reference?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          amount_in_kes?: number
+          church_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string | null
+          transaction_reference?: string | null
           updated_at?: string
         }
         Relationships: []

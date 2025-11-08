@@ -23,6 +23,7 @@ import {
   Baby,
 } from "lucide-react";
 import StatsCard from "@/components/admin/StatsCard";
+import { formatKES } from "@/lib/currencyUtils";
 
 import {
   LineChart,
@@ -105,7 +106,7 @@ const Dashboard = () => {
       users,
     ] = await Promise.all([
       supabase.from("contact_submissions").select("*", { count: "exact", head: true }),
-      supabase.from("donations").select("amount"),
+      supabase.from("donations").select("amount, selected_currency"),
       supabase.from("events").select("*", { count: "exact", head: true }),
       supabase.from("prayer_requests").select("*", { count: "exact", head: true }),
       supabase.from("churches").select("*", { count: "exact", head: true }),
@@ -116,12 +117,28 @@ const Dashboard = () => {
       supabase.from("profiles").select("*", { count: "exact", head: true }),
     ]);
 
-    const donationAmount = donations.data?.reduce((sum, d) => sum + (Number(d.amount) || 0), 0) || 0;
+    // Convert all donations to KES
+    let donationAmountKES = 0;
+    if (donations.data) {
+      for (const donation of donations.data) {
+        const amount = Number(donation.amount) || 0;
+        const currency = donation.selected_currency || 'KES';
+        
+        // Simple conversion rates (same as in currencyUtils)
+        const rates: Record<string, number> = {
+          'KES': 1, 'USD': 130, 'EUR': 140, 'GBP': 165,
+          'ZAR': 7.5, 'UGX': 0.035, 'TZS': 0.055,
+        };
+        
+        const rate = rates[currency] || 1;
+        donationAmountKES += amount * rate;
+      }
+    }
 
     setStats({
       totalContacts: contacts.count ?? 0,
       totalDonations: donations.data?.length ?? 0,
-      donationAmount,
+      donationAmount: donationAmountKES,
       totalEvents: events.count ?? 0,
       totalPrayers: prayers.count ?? 0,
       totalChurches: churches.count ?? 0,
@@ -142,17 +159,29 @@ const Dashboard = () => {
   const fetchDonationTrend = async () => {
     const { data } = await supabase
       .from("donations")
-      .select("created_at, amount")
+      .select("created_at, amount, selected_currency")
       .order("created_at", { ascending: true });
 
     if (data) {
       const monthlyData: Record<string, number> = {};
+      
       data.forEach((donation) => {
         const month = new Date(donation.created_at).toLocaleDateString("en-US", {
           month: "short",
           year: "numeric",
         });
-        monthlyData[month] = (monthlyData[month] || 0) + Number(donation.amount);
+        
+        // Convert to KES
+        const amount = Number(donation.amount) || 0;
+        const currency = donation.selected_currency || 'KES';
+        const rates: Record<string, number> = {
+          'KES': 1, 'USD': 130, 'EUR': 140, 'GBP': 165,
+          'ZAR': 7.5, 'UGX': 0.035, 'TZS': 0.055,
+        };
+        const rate = rates[currency] || 1;
+        const amountInKES = amount * rate;
+        
+        monthlyData[month] = (monthlyData[month] || 0) + amountInKES;
       });
 
       const trend = Object.entries(monthlyData).map(([month, amount]) => ({
@@ -216,7 +245,7 @@ const Dashboard = () => {
     if (newDonations.data) {
       activities.push(...newDonations.data.map(d => ({
         type: "donation",
-        text: `Donation received: $${d.amount}`,
+        text: `Donation received: ${formatKES(Number(d.amount))}`,
         time: new Date(d.created_at).toLocaleDateString(),
       })));
     }
@@ -279,7 +308,7 @@ const Dashboard = () => {
           />
           <StatsCard
             title="Total Donations"
-            value={`$${stats.donationAmount.toLocaleString()}`}
+            value={formatKES(stats.donationAmount)}
             icon={DollarSign}
             trend="+23.1%"
             trendUp
@@ -347,7 +376,7 @@ const Dashboard = () => {
                     }}
                   />
                   <Legend />
-                  <Line type="monotone" dataKey="amount" stroke="hsl(var(--chart-1))" strokeWidth={2} name="Amount ($)" />
+                  <Line type="monotone" dataKey="amount" stroke="hsl(var(--chart-1))" strokeWidth={2} name="Amount (KES)" />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>

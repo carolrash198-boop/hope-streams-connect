@@ -95,6 +95,7 @@ const sidebarGroups: SidebarGroup[] = [
   {
     title: "Fundraising",
     items: [
+      { title: "Tithes", icon: Church, href: "/admin/tithes" },
       { title: "Donations", icon: DollarSign, href: "/admin/donations" },
       { title: "Campaigns", icon: TrendingUp, href: "/admin/campaigns" },
       { title: "Fundraising Analytics", icon: TrendingUp, href: "/admin/fundraising-analytics" },

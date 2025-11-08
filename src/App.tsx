@@ -41,6 +41,7 @@ import AdminAdvertisements from "./pages/admin/Advertisements";
 import AdminChurches from "./pages/admin/Churches";
 import AdminChurchMembers from "./pages/admin/ChurchMembers";
 import AdminChurchResources from "./pages/admin/ChurchResources";
+import AdminTithes from "./pages/admin/Tithes";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient();
@@ -89,6 +90,7 @@ const App = () => (
           <Route path="/admin/churches" element={<AdminLayout><AdminChurches /></AdminLayout>} />
           <Route path="/admin/church-members" element={<AdminLayout><AdminChurchMembers /></AdminLayout>} />
           <Route path="/admin/church-resources" element={<AdminLayout><AdminChurchResources /></AdminLayout>} />
+          <Route path="/admin/tithes" element={<AdminLayout><AdminTithes /></AdminLayout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
