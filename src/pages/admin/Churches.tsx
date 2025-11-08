@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,8 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Edit, Trash2, Church } from "lucide-react";
+import { Plus, Edit, Trash2, Church, FileDown, FileText } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 
 interface Church {
   id: string;
@@ -152,15 +152,50 @@ const Churches = () => {
     });
     setSelectedChurch(null);
   };
+  const handleExportCSV = () => {
+    const exportData = churches.map(church => ({
+      Name: church.name,
+      Location: church.location,
+      Address: church.address || "",
+      Phone: church.phone || "",
+      Email: church.email || "",
+      Pastor: church.pastor_name || "",
+      "Member Count": church.member_count,
+      "Established Date": church.established_date || "",
+      Status: church.is_active ? "Active" : "Inactive",
+    }));
+    exportToCSV(exportData, "churches");
+    toast.success("Exported to CSV successfully");
+  };
+
+  const handleExportPDF = () => {
+    const exportData = churches.map(church => ({
+      Name: church.name,
+      Location: church.location,
+      Pastor: church.pastor_name || "",
+      "Member Count": church.member_count,
+      Status: church.is_active ? "Active" : "Inactive",
+    }));
+    exportToPDF(exportData, "churches", "Churches Report");
+    toast.success("Exported to PDF successfully");
+  };
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Churches</h1>
-            <p className="text-muted-foreground">Manage churches across Baringo</p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Churches</h1>
+          <p className="text-muted-foreground">Manage churches across Baringo</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportCSV} disabled={churches.length === 0}>
+            <FileText className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
+          <Button variant="outline" onClick={handleExportPDF} disabled={churches.length === 0}>
+            <FileDown className="mr-2 h-4 w-4" />
+            Export PDF
+          </Button>
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -244,12 +279,13 @@ const Churches = () => {
                   </div>
                 </div>
                 <Button onClick={handleCreate} disabled={!formData.name || !formData.location}>
-                  Create Church
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              Create Church
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
         </div>
+      </div>
 
         {loading ? (
           <Card>
@@ -397,11 +433,10 @@ const Churches = () => {
               <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
                 Delete
               </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
-    </AdminLayout>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 };
 
