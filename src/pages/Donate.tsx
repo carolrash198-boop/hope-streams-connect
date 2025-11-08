@@ -174,7 +174,7 @@ const Donate = () => {
           }}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="general">General Giving</TabsTrigger>
-              <TabsTrigger value="campaigns" id="campaigns">Specific Fundraising</TabsTrigger>
+              <TabsTrigger value="campaigns" id="campaigns">Fundraising</TabsTrigger>
             </TabsList>
 
             <TabsContent value="general">
