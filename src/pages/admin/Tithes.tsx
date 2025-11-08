@@ -31,7 +31,6 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, DollarSign, TrendingUp } from "lucide-react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import TablePagination from "@/components/admin/TablePagination";
 import { formatKES, convertToKES } from "@/lib/currencyUtils";
 
@@ -228,8 +227,7 @@ const Tithes = () => {
   const totalPages = Math.ceil(tithes.length / itemsPerPage);
 
   return (
-    <AdminLayout>
-      <div className="p-8 space-y-6">
+    <div className="p-8 space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Tithe Management</h1>
@@ -489,7 +487,6 @@ const Tithes = () => {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
   );
 };
 
