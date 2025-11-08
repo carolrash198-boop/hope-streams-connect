@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Plus, Edit, Trash2, Package, FileDown, FileText } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
+import TablePagination from "@/components/admin/TablePagination";
 
 interface Church {
   id: string;
@@ -40,6 +41,8 @@ const ChurchResources = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<ChurchResource | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [formData, setFormData] = useState({
     church_id: "",
     resource_name: "",
@@ -56,6 +59,14 @@ const ChurchResources = () => {
     last_maintenance_date: "",
     next_maintenance_date: "",
   });
+
+  const paginatedResources = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return resources.slice(startIndex, endIndex);
+  }, [resources, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(resources.length / itemsPerPage);
 
   useEffect(() => {
     fetchChurches();
@@ -483,7 +494,7 @@ const ChurchResources = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {resources.map((resource) => (
+                  {paginatedResources.map((resource) => (
                     <TableRow key={resource.id}>
                       <TableCell className="font-medium">
                         <div>
@@ -538,6 +549,17 @@ const ChurchResources = () => {
                   ))}
                 </TableBody>
               </Table>
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={resources.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newSize) => {
+                  setItemsPerPage(newSize);
+                  setCurrentPage(1);
+                }}
+              />
             </CardContent>
           </Card>
         )}

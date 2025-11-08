@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Plus, Edit, Trash2, Church, FileDown, FileText } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
+import TablePagination from "@/components/admin/TablePagination";
 
 interface Church {
   id: string;
@@ -32,6 +33,8 @@ const Churches = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedChurch, setSelectedChurch] = useState<Church | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [formData, setFormData] = useState({
     name: "",
     location: "",
@@ -41,6 +44,15 @@ const Churches = () => {
     pastor_name: "",
     established_date: "",
   });
+
+  // Paginated data
+  const paginatedChurches = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return churches.slice(startIndex, endIndex);
+  }, [churches, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(churches.length / itemsPerPage);
 
   useEffect(() => {
     fetchChurches();
@@ -316,7 +328,7 @@ const Churches = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {churches.map((church) => (
+                  {paginatedChurches.map((church) => (
                     <TableRow key={church.id}>
                       <TableCell className="font-medium">{church.name}</TableCell>
                       <TableCell>{church.location}</TableCell>
@@ -339,6 +351,17 @@ const Churches = () => {
                   ))}
                 </TableBody>
               </Table>
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={churches.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newSize) => {
+                  setItemsPerPage(newSize);
+                  setCurrentPage(1);
+                }}
+              />
             </CardContent>
           </Card>
         )}

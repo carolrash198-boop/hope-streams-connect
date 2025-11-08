@@ -23,7 +23,7 @@ import {
   Baby,
 } from "lucide-react";
 import StatsCard from "@/components/admin/StatsCard";
-import AdminFooter from "@/components/admin/AdminFooter";
+
 import {
   LineChart,
   Line,
@@ -504,8 +504,6 @@ const Dashboard = () => {
           </Card>
         </div>
       </div>
-      
-      <AdminFooter />
     </div>
   );
 };

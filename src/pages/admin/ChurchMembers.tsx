@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Plus, Edit, Trash2, Users, Search, FileDown, FileText } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
+import TablePagination from "@/components/admin/TablePagination";
 
 interface Church {
   id: string;
@@ -43,6 +44,8 @@ const ChurchMembers = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<ChurchMember | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [formData, setFormData] = useState({
     church_id: "",
     first_name: "",
@@ -205,18 +208,28 @@ const ChurchMembers = () => {
     setSelectedMember(null);
   };
 
-  const filteredMembers = members.filter((member) => {
-    const matchesSearch =
-      member.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.phone?.includes(searchTerm);
+  const filteredMembers = useMemo(() => {
+    return members.filter((member) => {
+      const matchesSearch =
+        member.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.phone?.includes(searchTerm);
 
-    const matchesChurch =
-      selectedChurchFilter === "all" || member.church_id === selectedChurchFilter;
+      const matchesChurch =
+        selectedChurchFilter === "all" || member.church_id === selectedChurchFilter;
 
-    return matchesSearch && matchesChurch;
-  });
+      return matchesSearch && matchesChurch;
+    });
+  }, [members, searchTerm, selectedChurchFilter]);
+
+  const paginatedMembers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredMembers.slice(startIndex, endIndex);
+  }, [filteredMembers, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
 
   const handleExportCSV = () => {
     const exportData = filteredMembers.map(member => ({
@@ -459,54 +472,67 @@ const ChurchMembers = () => {
                 <p className="text-muted-foreground">No members found</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Church</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Membership Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredMembers.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell className="font-medium">
-                        {member.first_name} {member.last_name}
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{member.churches.name}</div>
-                          <div className="text-sm text-muted-foreground">{member.churches.location}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {member.email && <div className="text-sm">{member.email}</div>}
-                        {member.phone && <div className="text-sm text-muted-foreground">{member.phone}</div>}
-                        {!member.email && !member.phone && "—"}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(member.membership_date).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={member.is_active ? "default" : "secondary"}>
-                          {member.is_active ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(member)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => { setSelectedMember(member); setDeleteDialogOpen(true); }}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Church</TableHead>
+                      <TableHead>Contact</TableHead>
+                      <TableHead>Membership Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedMembers.map((member) => (
+                      <TableRow key={member.id}>
+                        <TableCell className="font-medium">
+                          {member.first_name} {member.last_name}
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{member.churches.name}</div>
+                            <div className="text-sm text-muted-foreground">{member.churches.location}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {member.email && <div className="text-sm">{member.email}</div>}
+                          {member.phone && <div className="text-sm text-muted-foreground">{member.phone}</div>}
+                          {!member.email && !member.phone && "—"}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(member.membership_date).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={member.is_active ? "default" : "secondary"}>
+                            {member.is_active ? "Active" : "Inactive"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" onClick={() => openEditDialog(member)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => { setSelectedMember(member); setDeleteDialogOpen(true); }}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <TablePagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={filteredMembers.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                  onItemsPerPageChange={(newSize) => {
+                    setItemsPerPage(newSize);
+                    setCurrentPage(1);
+                  }}
+                />
+              </>
             )}
           </CardContent>
         </Card>
