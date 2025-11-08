@@ -55,11 +55,15 @@ const Users = () => {
   const fetchProfiles = async () => {
     setLoading(true);
     try {
+      // Fetch all users from auth.users via admin API
+      const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
+
+      if (usersError) throw usersError;
+
       // Fetch profiles
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*");
 
       if (profilesError) throw profilesError;
 
@@ -70,14 +74,22 @@ const Users = () => {
 
       if (rolesError) throw rolesError;
 
-      // Combine profiles with their roles
-      const usersWithRoles = (profilesData || []).map(profile => {
+      // Combine auth users with profiles and roles
+      const usersWithRoles = (users || []).map(user => {
+        const profile = profilesData?.find(p => p.user_id === user.id);
         const userRoles = (rolesData || [])
-          .filter(r => r.user_id === profile.user_id)
+          .filter(r => r.user_id === user.id)
           .map(r => r.role);
         
         return {
-          ...profile,
+          id: profile?.id || user.id,
+          user_id: user.id,
+          first_name: profile?.first_name || user.user_metadata?.first_name || null,
+          last_name: profile?.last_name || user.user_metadata?.last_name || null,
+          email: user.email || null,
+          phone: profile?.phone || user.phone || null,
+          role: profile?.role || null,
+          created_at: user.created_at,
           roles: userRoles
         };
       });

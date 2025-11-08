@@ -4,8 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
   { name: "Dashboard", icon: Home, path: "/admin/dashboard" },
-  { name: "Hero Settings", icon: Settings, path: "/admin/hero-settings" },
-  { name: "Footer Settings", icon: Settings, path: "/admin/footer-settings" },
+  { name: "Users", icon: Users, path: "/admin/users" },
   { name: "Services", icon: Church, path: "/admin/services" },
   { name: "Events", icon: Calendar, path: "/admin/events" },
   { name: "Sermons", icon: FileText, path: "/admin/sermons" },
@@ -24,7 +23,8 @@ const navigation = [
   { name: "Analytics", icon: TrendingUp, path: "/admin/fundraising-analytics" },
   { name: "Payment Methods", icon: CreditCard, path: "/admin/payment-methods" },
   { name: "Blog Posts", icon: BookOpen, path: "/admin/blog" },
-  { name: "Users", icon: Users, path: "/admin/users" },
+  { name: "Hero Settings", icon: Settings, path: "/admin/hero-settings" },
+  { name: "Footer Settings", icon: Settings, path: "/admin/footer-settings" },
 ];
 
 const AdminSidebar = () => {
