@@ -55,7 +55,7 @@ const Campaigns = () => {
       setCampaigns(data || []);
     } catch (error) {
       console.error("Error fetching campaigns:", error);
-      toast.error("Failed to load campaigns");
+      toast.error("Failed to load fundraising");
     } finally {
       setLoading(false);
     }
@@ -84,12 +84,12 @@ const Campaigns = () => {
           .eq("id", editingCampaign.id);
 
         if (error) throw error;
-        toast.success("Campaign updated successfully");
+        toast.success("Fundraising updated successfully");
       } else {
         const { error } = await supabase.from("campaigns").insert(campaignData);
 
         if (error) throw error;
-        toast.success("Campaign created successfully");
+        toast.success("Fundraising created successfully");
       }
 
       setOpen(false);
@@ -97,22 +97,22 @@ const Campaigns = () => {
       fetchCampaigns();
     } catch (error) {
       console.error("Error saving campaign:", error);
-      toast.error("Failed to save campaign");
+      toast.error("Failed to save fundraising");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this campaign?")) return;
+    if (!confirm("Are you sure you want to delete this fundraising?")) return;
 
     try {
       const { error } = await supabase.from("campaigns").delete().eq("id", id);
 
       if (error) throw error;
-      toast.success("Campaign deleted successfully");
+      toast.success("Fundraising deleted successfully");
       fetchCampaigns();
     } catch (error) {
       console.error("Error deleting campaign:", error);
-      toast.error("Failed to delete campaign");
+      toast.error("Failed to delete fundraising");
     }
   };
 
@@ -161,7 +161,7 @@ const Campaigns = () => {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Campaign Management</h1>
+        <h1 className="text-3xl font-bold">Fundraising Management</h1>
         <Dialog open={open} onOpenChange={(isOpen) => {
           setOpen(isOpen);
           if (!isOpen) resetForm();
@@ -169,13 +169,13 @@ const Campaigns = () => {
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add Campaign
+              Add Fundraising
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {editingCampaign ? "Edit Campaign" : "Add New Campaign"}
+                {editingCampaign ? "Edit Fundraising" : "Add New Fundraising"}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -342,7 +342,7 @@ const Campaigns = () => {
         {campaigns.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
-              No campaigns yet. Create your first campaign to get started.
+              No fundraising yet. Create your first fundraising to get started.
             </CardContent>
           </Card>
         )}

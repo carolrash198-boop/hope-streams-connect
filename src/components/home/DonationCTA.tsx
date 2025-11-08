@@ -167,9 +167,9 @@ export const DonationCTA = () => {
                 <Card>
                   <CardContent className="p-8 text-center">
                     <Target className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                    <h4 className="text-lg font-semibold mb-2">No Active Campaigns</h4>
+                    <h4 className="text-lg font-semibold mb-2">No Active Fundraising</h4>
                     <p className="text-muted-foreground mb-6">
-                      Check back soon for special fundraising campaigns and ministry initiatives.
+                      Check back soon for special fundraising opportunities and ministry initiatives.
                     </p>
                     <Button asChild variant="outline">
                       <Link to="/donate">

@@ -159,7 +159,7 @@ const Donate = () => {
                 Donate Now
               </Button>
               <Button size="lg" variant="outline" onClick={() => document.getElementById('campaigns')?.scrollIntoView({ behavior: 'smooth' })}>
-                View Campaigns
+                View Fundraising
               </Button>
             </div>
           </div>
@@ -174,7 +174,7 @@ const Donate = () => {
           }}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="general">General Giving</TabsTrigger>
-              <TabsTrigger value="campaigns" id="campaigns">Specific Campaigns</TabsTrigger>
+              <TabsTrigger value="campaigns" id="campaigns">Specific Fundraising</TabsTrigger>
             </TabsList>
 
             <TabsContent value="general">
@@ -339,11 +339,11 @@ const Donate = () => {
 
             <TabsContent value="campaigns" className="space-y-6">
               {loading ? (
-                <div className="text-center py-12">Loading campaigns...</div>
+                <div className="text-center py-12">Loading fundraising...</div>
               ) : campaigns.length === 0 ? (
                 <Card>
                   <CardContent className="py-12 text-center">
-                    <p className="text-muted-foreground">No active campaigns at the moment.</p>
+                    <p className="text-muted-foreground">No active fundraising at the moment.</p>
                   </CardContent>
                 </Card>
               ) : (
@@ -376,7 +376,7 @@ const Donate = () => {
                           }}
                         >
                           <DollarSign className="mr-2 h-4 w-4" />
-                          Support This Campaign
+                          Support This Fundraising
                         </Button>
                       ) : (
                         <div className="space-y-6">
