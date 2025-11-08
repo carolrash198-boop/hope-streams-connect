@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -166,7 +165,7 @@ export default function Advertisements() {
   };
 
   return (
-    <AdminLayout>
+    <div className="p-8">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -323,6 +322,6 @@ export default function Advertisements() {
           </div>
         )}
       </div>
-    </AdminLayout>
+    </div>
   );
 }
