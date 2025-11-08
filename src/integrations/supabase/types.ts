@@ -152,6 +152,202 @@ export type Database = {
         }
         Relationships: []
       }
+      church_members: {
+        Row: {
+          address: string | null
+          baptism_date: string | null
+          church_id: string
+          created_at: string | null
+          created_by: string | null
+          date_of_birth: string | null
+          email: string | null
+          first_name: string
+          gender: string | null
+          id: string
+          is_active: boolean | null
+          last_name: string
+          marital_status: string | null
+          membership_date: string | null
+          ministry_involvement: string[] | null
+          notes: string | null
+          occupation: string | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          baptism_date?: string | null
+          church_id: string
+          created_at?: string | null
+          created_by?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          first_name: string
+          gender?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_name: string
+          marital_status?: string | null
+          membership_date?: string | null
+          ministry_involvement?: string[] | null
+          notes?: string | null
+          occupation?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          baptism_date?: string | null
+          church_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          first_name?: string
+          gender?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_name?: string
+          marital_status?: string | null
+          membership_date?: string | null
+          ministry_involvement?: string[] | null
+          notes?: string | null
+          occupation?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_members_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      church_resources: {
+        Row: {
+          assigned_to: string | null
+          church_id: string
+          condition: string | null
+          created_at: string | null
+          created_by: string | null
+          current_value: number | null
+          description: string | null
+          id: string
+          is_available: boolean | null
+          last_maintenance_date: string | null
+          location: string | null
+          maintenance_schedule: string | null
+          next_maintenance_date: string | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          quantity: number | null
+          resource_name: string
+          resource_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          church_id: string
+          condition?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          is_available?: boolean | null
+          last_maintenance_date?: string | null
+          location?: string | null
+          maintenance_schedule?: string | null
+          next_maintenance_date?: string | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          quantity?: number | null
+          resource_name: string
+          resource_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          church_id?: string
+          condition?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          is_available?: boolean | null
+          last_maintenance_date?: string | null
+          location?: string | null
+          maintenance_schedule?: string | null
+          next_maintenance_date?: string | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          quantity?: number | null
+          resource_name?: string
+          resource_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_resources_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      churches: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          established_date: string | null
+          id: string
+          is_active: boolean | null
+          location: string
+          member_count: number | null
+          name: string
+          pastor_name: string | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          established_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          location: string
+          member_count?: number | null
+          name: string
+          pastor_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          established_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string
+          member_count?: number | null
+          name?: string
+          pastor_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       class_visits: {
         Row: {
           child_age: number | null

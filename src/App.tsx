@@ -38,6 +38,9 @@ import AdminHeroSettings from "./pages/admin/HeroSettings";
 import AdminFooterSettings from "./pages/admin/FooterSettings";
 import AdminFundraisingAnalytics from "./pages/admin/FundraisingAnalytics";
 import AdminAdvertisements from "./pages/admin/Advertisements";
+import AdminChurches from "./pages/admin/Churches";
+import AdminChurchMembers from "./pages/admin/ChurchMembers";
+import AdminChurchResources from "./pages/admin/ChurchResources";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient();
@@ -83,6 +86,9 @@ const App = () => (
           <Route path="/admin/sunday-school-content" element={<AdminLayout><AdminSundaySchoolContent /></AdminLayout>} />
           <Route path="/admin/class-visits" element={<AdminLayout><AdminClassVisits /></AdminLayout>} />
           <Route path="/admin/advertisements" element={<AdminLayout><AdminAdvertisements /></AdminLayout>} />
+          <Route path="/admin/churches" element={<AdminLayout><AdminChurches /></AdminLayout>} />
+          <Route path="/admin/church-members" element={<AdminLayout><AdminChurchMembers /></AdminLayout>} />
+          <Route path="/admin/church-resources" element={<AdminLayout><AdminChurchResources /></AdminLayout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
