@@ -130,40 +130,70 @@ const Tithes = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const amount = parseFloat(formData.amount);
-    const amountInKes = await convertToKES(amount, formData.currency);
-
-    const titheData = {
-      ...formData,
-      amount,
-      amount_in_kes: amountInKes,
-      member_id: formData.member_id || null,
-    };
-
-    if (editingTithe) {
-      const { error } = await supabase
-        .from("tithes")
-        .update(titheData)
-        .eq("id", editingTithe.id);
-
-      if (error) {
-        toast.error("Failed to update tithe");
-        return;
-      }
-      toast.success("Tithe updated successfully");
-    } else {
-      const { error } = await supabase.from("tithes").insert([titheData]);
-
-      if (error) {
-        toast.error("Failed to add tithe");
-        return;
-      }
-      toast.success("Tithe added successfully");
+    // Validate required fields
+    if (!formData.church_id) {
+      toast.error("Please select a church");
+      return;
     }
+    
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+    
+    if (!formData.payment_date) {
+      toast.error("Please select a payment date");
+      return;
+    }
+    
+    try {
+      const amount = parseFloat(formData.amount);
+      const amountInKes = await convertToKES(amount, formData.currency);
 
-    setIsDialogOpen(false);
-    resetForm();
-    fetchData();
+      const titheData = {
+        church_id: formData.church_id,
+        member_id: formData.member_id || null,
+        amount,
+        currency: formData.currency,
+        amount_in_kes: amountInKes,
+        payment_method: formData.payment_method || null,
+        payment_date: formData.payment_date,
+        transaction_reference: formData.transaction_reference || null,
+        notes: formData.notes || null,
+      };
+
+      if (editingTithe) {
+        const { error } = await supabase
+          .from("tithes")
+          .update(titheData)
+          .eq("id", editingTithe.id);
+
+        if (error) {
+          console.error("Error updating tithe:", error);
+          toast.error("Failed to update tithe: " + error.message);
+          return;
+        }
+        toast.success("Tithe updated successfully");
+      } else {
+        const { error } = await supabase
+          .from("tithes")
+          .insert([titheData]);
+
+        if (error) {
+          console.error("Error adding tithe:", error);
+          toast.error("Failed to add tithe: " + error.message);
+          return;
+        }
+        toast.success("Tithe added successfully");
+      }
+
+      setIsDialogOpen(false);
+      resetForm();
+      fetchData();
+    } catch (error) {
+      console.error("Error processing tithe:", error);
+      toast.error("An error occurred while processing the tithe");
+    }
   };
 
   const handleEdit = (tithe: Tithe) => {
