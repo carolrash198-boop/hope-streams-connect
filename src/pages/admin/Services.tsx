@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { Trash2, Edit, Plus } from "lucide-react";
 
 const Services = () => {
   const [schedules, setSchedules] = useState<any[]>([]);
@@ -366,7 +375,6 @@ const Services = () => {
           </Tabs>
         </div>
       </div>
-    </div>
   );
 };
 
