@@ -72,7 +72,6 @@ const sidebarGroups: SidebarGroup[] = [
       { title: "Sermons", icon: PlaySquare, href: "/admin/sermons" },
       { title: "Sunday School", icon: Baby, href: "/admin/sunday-school" },
       { title: "Sunday School Content", icon: BookOpen, href: "/admin/sunday-school-content" },
-      { title: "Bible Studies", icon: BookOpen, href: "/admin/auth" },
       { title: "Live Stream", icon: Video, href: "/admin/live-stream" },
       { title: "Live Coverage", icon: PlaySquare, href: "/admin/live-coverage" },
     ],
