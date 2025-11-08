@@ -72,11 +72,19 @@ const ChurchMembers = () => {
       const { data, error } = await supabase
         .from("churches")
         .select("id, name, location")
-        .eq("is_active", true)
         .order("name");
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching churches:", error);
+        toast.error("Failed to load churches: " + error.message);
+        return;
+      }
+      
       setChurches(data || []);
+      
+      if (!data || data.length === 0) {
+        toast.info("No churches found. Please add a church first.");
+      }
     } catch (error) {
       console.error("Error fetching churches:", error);
       toast.error("Failed to load churches");
