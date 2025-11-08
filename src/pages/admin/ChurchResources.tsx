@@ -130,6 +130,9 @@ const ChurchResources = () => {
         ...formData,
         purchase_cost: formData.purchase_cost ? parseFloat(formData.purchase_cost) : null,
         current_value: formData.current_value ? parseFloat(formData.current_value) : null,
+        purchase_date: formData.purchase_date || null,
+        last_maintenance_date: formData.last_maintenance_date || null,
+        next_maintenance_date: formData.next_maintenance_date || null,
       }]);
 
       if (error) throw error;
