@@ -1,24 +1,34 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import AdminSidebar from "./AdminSidebar";
-import NotificationBell from "./NotificationBell";
+import AdminNavbar from "./AdminNavbar";
+import AdminFooter from "./AdminFooter";
 
 interface AdminLayoutProps {
   children: ReactNode;
 }
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
-    <div className="flex min-h-screen w-full bg-muted/10">
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col">
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-6">
-          <div className="ml-auto">
-            <NotificationBell />
-          </div>
-        </header>
-        <div className="flex-1">
+    <div className="flex h-screen w-full overflow-hidden bg-muted/10">
+      {/* Sidebar */}
+      <div className={`${sidebarOpen ? 'block' : 'hidden'} md:block`}>
+        <AdminSidebar />
+      </div>
+      
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Sticky Navigation */}
+        <AdminNavbar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        
+        {/* Scrollable Content */}
+        <main className="flex-1 overflow-y-auto">
           {children}
-        </div>
+        </main>
+        
+        {/* Sticky Footer */}
+        <AdminFooter />
       </div>
     </div>
   );
