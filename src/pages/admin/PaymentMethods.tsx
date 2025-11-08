@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -111,9 +110,7 @@ const PaymentMethods = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <AdminSidebar />
-      <main className="flex-1 p-8">
+    <main className="p-8">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Payment Methods</h1>
@@ -267,7 +264,6 @@ const PaymentMethods = () => {
           </DialogContent>
         </Dialog>
       </main>
-    </div>
   );
 };
 

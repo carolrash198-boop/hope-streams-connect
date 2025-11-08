@@ -16,7 +16,6 @@ import {
   MessageSquare,
   BookOpen,
 } from "lucide-react";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import StatsCard from "@/components/admin/StatsCard";
 import RecentSignups from "@/components/admin/RecentSignups";
 
@@ -91,11 +90,8 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-muted/10">
-      <AdminSidebar />
-      
-      <div className="flex-1 p-8">
-        <div className="flex justify-between items-center mb-8">
+    <div className="p-8">
+      <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>
             <p className="text-muted-foreground">Welcome back, Admin</p>
@@ -221,7 +217,6 @@ const Dashboard = () => {
           </Card>
         </div>
       </div>
-    </div>
   );
 };
 

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,9 +57,7 @@ const Prayers = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-muted/10">
-      <AdminSidebar />
-      <div className="flex-1 p-8">
+    <div className="p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Prayer Requests</h1>
           <p className="text-muted-foreground">View and manage prayer requests</p>
@@ -111,7 +108,6 @@ const Prayers = () => {
           ))}
         </div>
       </div>
-    </div>
   );
 };
 

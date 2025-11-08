@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -33,9 +32,7 @@ const Users = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-muted/10">
-      <AdminSidebar />
-      <div className="flex-1 p-8">
+    <div className="p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Users Management</h1>
           <p className="text-muted-foreground">View all registered users</p>
@@ -70,7 +67,6 @@ const Users = () => {
             </Card>
           ))}
         </div>
-      </div>
     </div>
   );
 };

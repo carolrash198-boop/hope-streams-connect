@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -143,9 +142,7 @@ const LiveStream = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-muted/10">
-      <AdminSidebar />
-      <div className="flex-1 p-8">
+    <div className="p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Live Stream Settings</h1>
@@ -300,7 +297,6 @@ const LiveStream = () => {
             </Card>
           ))}
         </div>
-      </div>
     </div>
   );
 };

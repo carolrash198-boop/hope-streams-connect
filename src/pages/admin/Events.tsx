@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -118,9 +117,7 @@ const Events = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-muted/10">
-      <AdminSidebar />
-      <div className="flex-1 p-8">
+    <div className="p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Events Management</h1>
@@ -229,7 +226,6 @@ const Events = () => {
           ))}
         </div>
       </div>
-    </div>
   );
 };
 
