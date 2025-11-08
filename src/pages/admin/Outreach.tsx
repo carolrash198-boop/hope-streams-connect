@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Trash2, Edit, Plus } from "lucide-react";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 
 interface OutreachProject {
   id: string;
@@ -150,11 +149,8 @@ const Outreach = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen">
-        <AdminSidebar />
-        <div className="flex-1 p-8">
-          <p>Loading...</p>
-        </div>
+      <div className="p-8">
+        <p>Loading...</p>
       </div>
     );
   }
@@ -164,10 +160,8 @@ const Outreach = () => {
   const volunteerOpportunities = projects.filter(p => p.project_type === "volunteer_opportunity");
 
   return (
-    <div className="flex h-screen">
-      <AdminSidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
+    <div className="overflow-auto">
+      <div className="p-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold">Manage Outreach Content</h1>
             <Dialog open={dialogOpen} onOpenChange={(open) => {
@@ -423,7 +417,6 @@ const Outreach = () => {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 };

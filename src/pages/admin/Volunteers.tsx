@@ -1,16 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import { Trash2, Edit, Plus, Mail, Phone } from "lucide-react";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 
 interface VolunteerSubmission {
   id: string;
@@ -126,20 +116,15 @@ const Volunteers = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen">
-        <AdminSidebar />
-        <div className="flex-1 p-8">
-          <p>Loading...</p>
-        </div>
+      <div className="p-8">
+        <p>Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen">
-      <AdminSidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
+    <div className="overflow-auto">
+      <div className="p-8">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-3xl font-bold">Volunteer Management</h1>

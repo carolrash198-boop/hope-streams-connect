@@ -1,15 +1,5 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, Edit } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 
 const Services = () => {
   const [schedules, setSchedules] = useState<any[]>([]);
@@ -178,13 +168,11 @@ const Services = () => {
     setDialogOpen(true);
   };
 
-  if (loading) return <div className="flex"><AdminSidebar /><div className="flex-1 p-8">Loading...</div></div>;
+  if (loading) return <div className="p-8">Loading...</div>;
 
   return (
-    <div className="flex h-screen">
-      <AdminSidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
+    <div className="overflow-auto">
+      <div className="p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Services Management</h1>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
