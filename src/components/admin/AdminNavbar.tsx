@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
   HelpCircle,
   Menu,
   ChevronRight,
+  Clock,
 } from "lucide-react";
 import {
   Command,
@@ -42,13 +43,21 @@ const AdminNavbar = ({ onMenuToggle }: AdminNavbarProps) => {
   const location = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Get user info
-  useState(() => {
+  // Get user info and set up clock
+  useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
     });
-  });
+
+    // Update clock every second
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -149,6 +158,27 @@ const AdminNavbar = ({ onMenuToggle }: AdminNavbarProps) => {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2">
+            {/* Live Clock */}
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/50 border border-border/50">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <div className="flex flex-col leading-none">
+                <span className="text-xs font-medium">
+                  {currentTime.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                  })}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  {currentTime.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </span>
+              </div>
+            </div>
+
             {/* Quick Help */}
             <Button
               variant="ghost"
