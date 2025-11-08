@@ -111,16 +111,42 @@ const Tithes = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const [tithesRes, churchesRes, membersRes] = await Promise.all([
-      supabase.from("tithes").select("*").order("payment_date", { ascending: false }),
-      supabase.from("churches").select("id, name"),
-      supabase.from("church_members").select("id, first_name, last_name"),
-    ]);
+    try {
+      const [tithesRes, churchesRes, membersRes] = await Promise.all([
+        supabase.from("tithes").select("*").order("payment_date", { ascending: false }),
+        supabase.from("churches").select("id, name").order("name"),
+        supabase.from("church_members").select("id, first_name, last_name").order("first_name"),
+      ]);
 
-    if (tithesRes.data) setTithes(tithesRes.data);
-    if (churchesRes.data) setChurches(churchesRes.data);
-    if (membersRes.data) setMembers(membersRes.data);
-    setLoading(false);
+      if (tithesRes.error) {
+        console.error("Error fetching tithes:", tithesRes.error);
+        toast.error("Failed to load tithes: " + tithesRes.error.message);
+      } else {
+        setTithes(tithesRes.data || []);
+      }
+
+      if (churchesRes.error) {
+        console.error("Error fetching churches:", churchesRes.error);
+        toast.error("Failed to load churches: " + churchesRes.error.message);
+      } else {
+        setChurches(churchesRes.data || []);
+        if (!churchesRes.data || churchesRes.data.length === 0) {
+          toast.info("No churches found. Please add a church first.");
+        }
+      }
+
+      if (membersRes.error) {
+        console.error("Error fetching members:", membersRes.error);
+        toast.error("Failed to load members: " + membersRes.error.message);
+      } else {
+        setMembers(membersRes.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Failed to load data");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const calculateTotalTithes = () => {
