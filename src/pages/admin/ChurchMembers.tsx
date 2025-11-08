@@ -261,7 +261,7 @@ const ChurchMembers = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Church Members</h1>
@@ -343,114 +343,30 @@ const ChurchMembers = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="date_of_birth">Date of Birth</Label>
-                    <Input
-                      id="date_of_birth"
-                      type="date"
-                      value={formData.date_of_birth}
-                      onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="gender">Gender</Label>
-                    <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="marital_status">Marital Status</Label>
-                    <Select value={formData.marital_status} onValueChange={(value) => setFormData({ ...formData, marital_status: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="single">Single</SelectItem>
-                        <SelectItem value="married">Married</SelectItem>
-                        <SelectItem value="widowed">Widowed</SelectItem>
-                        <SelectItem value="divorced">Divorced</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Textarea
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="occupation">Occupation</Label>
-                    <Input
-                      id="occupation"
-                      value={formData.occupation}
-                      onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="membership_date">Membership Date</Label>
-                    <Input
-                      id="membership_date"
-                      type="date"
-                      value={formData.membership_date}
-                      onChange={(e) => setFormData({ ...formData, membership_date: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="baptism_date">Baptism Date</Label>
-                  <Input
-                    id="baptism_date"
-                    type="date"
-                    value={formData.baptism_date}
-                    onChange={(e) => setFormData({ ...formData, baptism_date: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Notes</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Any additional information..."
-                  />
-                </div>
-
                 <Button onClick={handleCreate}>Add Member</Button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
+      </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <CardTitle>All Members ({filteredMembers.length})</CardTitle>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-initial">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search members..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-8 w-full sm:w-[300px]"
                 />
               </div>
               <Select value={selectedChurchFilter} onValueChange={setSelectedChurchFilter}>
-                <SelectTrigger className="w-[250px]">
-                  <SelectValue placeholder="Filter by church" />
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="All Churches" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Churches</SelectItem>
@@ -462,17 +378,38 @@ const ChurchMembers = () => {
                 </SelectContent>
               </Select>
             </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="py-8 text-center">Loading members...</div>
-            ) : filteredMembers.length === 0 ? (
-              <div className="py-8 text-center">
-                <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No members found</p>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="py-12 text-center">
+              <div className="animate-pulse">Loading members...</div>
+            </div>
+          ) : filteredMembers.length === 0 ? (
+            <div className="py-16 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="rounded-full bg-muted p-6">
+                  <Users className="h-10 w-10 text-muted-foreground" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">No members found</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {searchTerm || selectedChurchFilter !== "all"
+                      ? "Try adjusting your search or filter"
+                      : "Get started by adding your first church member"}
+                  </p>
+                  {!searchTerm && selectedChurchFilter === "all" && (
+                    <Button onClick={() => setCreateDialogOpen(true)}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add First Member
+                    </Button>
+                  )}
+                </div>
               </div>
-            ) : (
-              <>
+            </div>
+          ) : (
+            <>
+              <div className="rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -510,17 +447,21 @@ const ChurchMembers = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="icon" onClick={() => openEditDialog(member)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => { setSelectedMember(member); setDeleteDialogOpen(true); }}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(member)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => { setSelectedMember(member); setDeleteDialogOpen(true); }}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
+              </div>
+              <div className="mt-4">
                 <TablePagination
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -532,67 +473,67 @@ const ChurchMembers = () => {
                     setCurrentPage(1);
                   }}
                 />
-              </>
-            )}
-          </CardContent>
-        </Card>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
-        {/* Edit Dialog - Similar structure to Create Dialog */}
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Edit Member</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4">
-              {/* Same form fields as create */}
-              <div className="space-y-2">
-                <Label>Church *</Label>
-                <Select value={formData.church_id} onValueChange={(value) => setFormData({ ...formData, church_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {churches.map((church) => (
-                      <SelectItem key={church.id} value={church.id}>
-                        {church.name} - {church.location}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>First Name *</Label>
-                  <Input value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Last Name *</Label>
-                  <Input value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} />
-                </div>
-              </div>
-              <Button onClick={handleEdit}>Update Member</Button>
+      {/* Edit Dialog - Similar structure to Create Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Member</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4">
+            {/* Same form fields as create */}
+            <div className="space-y-2">
+              <Label>Church *</Label>
+              <Select value={formData.church_id} onValueChange={(value) => setFormData({ ...formData, church_id: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {churches.map((church) => (
+                    <SelectItem key={church.id} value={church.id}>
+                      {church.name} - {church.location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </DialogContent>
-        </Dialog>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>First Name *</Label>
+                <Input value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Last Name *</Label>
+                <Input value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} />
+              </div>
+            </div>
+            <Button onClick={handleEdit}>Update Member</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-        {/* Delete Dialog */}
-        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete Member</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to delete {selectedMember?.first_name} {selectedMember?.last_name}? This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+      {/* Delete Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Member</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedMember?.first_name} {selectedMember?.last_name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

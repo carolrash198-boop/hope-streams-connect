@@ -266,7 +266,7 @@ const ChurchResources = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Church Resources</h1>
@@ -346,141 +346,46 @@ const ChurchResources = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="quantity">Quantity</Label>
-                    <Input
-                      id="quantity"
-                      type="number"
-                      min="1"
-                      value={formData.quantity}
-                      onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="condition">Condition</Label>
-                    <Select value={formData.condition} onValueChange={(value) => setFormData({ ...formData, condition: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {conditions.map((cond) => (
-                          <SelectItem key={cond.value} value={cond.value}>
-                            {cond.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="location">Location</Label>
-                    <Input
-                      id="location"
-                      value={formData.location}
-                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      placeholder="Where is it stored?"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="purchase_date">Purchase Date</Label>
-                    <Input
-                      id="purchase_date"
-                      type="date"
-                      value={formData.purchase_date}
-                      onChange={(e) => setFormData({ ...formData, purchase_date: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="purchase_cost">Purchase Cost</Label>
-                    <Input
-                      id="purchase_cost"
-                      type="number"
-                      step="0.01"
-                      value={formData.purchase_cost}
-                      onChange={(e) => setFormData({ ...formData, purchase_cost: e.target.value })}
-                      placeholder="0.00"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="current_value">Current Value</Label>
-                    <Input
-                      id="current_value"
-                      type="number"
-                      step="0.01"
-                      value={formData.current_value}
-                      onChange={(e) => setFormData({ ...formData, current_value: e.target.value })}
-                      placeholder="0.00"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="assigned_to">Assigned To</Label>
-                  <Input
-                    id="assigned_to"
-                    value={formData.assigned_to}
-                    onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                    placeholder="Person or department"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="maintenance_schedule">Maintenance Schedule</Label>
-                  <Input
-                    id="maintenance_schedule"
-                    value={formData.maintenance_schedule}
-                    onChange={(e) => setFormData({ ...formData, maintenance_schedule: e.target.value })}
-                    placeholder="e.g., Monthly, Quarterly, Annual"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="last_maintenance">Last Maintenance</Label>
-                    <Input
-                      id="last_maintenance"
-                      type="date"
-                      value={formData.last_maintenance_date}
-                      onChange={(e) => setFormData({ ...formData, last_maintenance_date: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="next_maintenance">Next Maintenance</Label>
-                    <Input
-                      id="next_maintenance"
-                      type="date"
-                      value={formData.next_maintenance_date}
-                      onChange={(e) => setFormData({ ...formData, next_maintenance_date: e.target.value })}
-                    />
-                  </div>
-                </div>
-
                 <Button onClick={handleCreate}>Add Resource</Button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
+      </div>
 
-        {loading ? (
-          <Card>
-            <CardContent className="py-8 text-center">Loading resources...</CardContent>
-          </Card>
-        ) : resources.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No resources found. Add your first resource to get started.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>All Resources ({resources.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
+      {loading ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <div className="animate-pulse">Loading resources...</div>
+          </CardContent>
+        </Card>
+      ) : resources.length === 0 ? (
+        <Card>
+          <CardContent className="py-16">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="rounded-full bg-primary/10 p-6">
+                <Package className="h-12 w-12 text-primary" />
+              </div>
+              <div className="max-w-md">
+                <h3 className="font-semibold text-lg mb-2">No resources yet</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Start tracking your church equipment, facilities, and assets by adding your first resource.
+                </p>
+                <Button onClick={() => setCreateDialogOpen(true)} size="lg">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add First Resource
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>All Resources ({resources.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -531,24 +436,28 @@ const ChurchResources = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(resource)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setSelectedResource(resource);
-                            setDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => openEditDialog(resource)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setSelectedResource(resource);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+            </div>
+            <div className="mt-4">
               <TablePagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -560,79 +469,79 @@ const ChurchResources = () => {
                   setCurrentPage(1);
                 }}
               />
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Edit Dialog */}
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Edit Resource</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4">
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Resource</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <div className="space-y-2">
+              <Label>Church *</Label>
+              <Select value={formData.church_id} onValueChange={(value) => setFormData({ ...formData, church_id: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {churches.map((church) => (
+                    <SelectItem key={church.id} value={church.id}>
+                      {church.name} - {church.location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Church *</Label>
-                <Select value={formData.church_id} onValueChange={(value) => setFormData({ ...formData, church_id: value })}>
+                <Label>Resource Name *</Label>
+                <Input
+                  value={formData.resource_name}
+                  onChange={(e) => setFormData({ ...formData, resource_name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Type *</Label>
+                <Select value={formData.resource_type} onValueChange={(value) => setFormData({ ...formData, resource_type: value })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {churches.map((church) => (
-                      <SelectItem key={church.id} value={church.id}>
-                        {church.name} - {church.location}
+                    {resourceTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Resource Name *</Label>
-                  <Input
-                    value={formData.resource_name}
-                    onChange={(e) => setFormData({ ...formData, resource_name: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Type *</Label>
-                  <Select value={formData.resource_type} onValueChange={(value) => setFormData({ ...formData, resource_type: value })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {resourceTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <Button onClick={handleEdit}>Update Resource</Button>
             </div>
-          </DialogContent>
-        </Dialog>
+            <Button onClick={handleEdit}>Update Resource</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-        {/* Delete Dialog */}
-        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete Resource</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to delete "{selectedResource?.resource_name}"? This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+      {/* Delete Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Resource</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{selectedResource?.resource_name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
