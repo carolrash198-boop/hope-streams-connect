@@ -1,4 +1,4 @@
-import { Home, Calendar, Mail, FileText, Image, Users, Heart, DollarSign, BookOpen, GraduationCap, UserCheck, Church, BookMarked, Video, HandHeart, Settings, CreditCard, Target } from "lucide-react";
+import { Home, Calendar, Mail, FileText, Image, Users, Heart, DollarSign, BookOpen, GraduationCap, UserCheck, Church, BookMarked, Video, HandHeart, Settings, CreditCard, Target, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
 
@@ -21,6 +21,7 @@ const navigation = [
   { name: "Prayer Requests", icon: Heart, path: "/admin/prayers" },
   { name: "Donations", icon: DollarSign, path: "/admin/donations" },
   { name: "Campaigns", icon: Target, path: "/admin/campaigns" },
+  { name: "Analytics", icon: TrendingUp, path: "/admin/fundraising-analytics" },
   { name: "Payment Methods", icon: CreditCard, path: "/admin/payment-methods" },
   { name: "Blog Posts", icon: BookOpen, path: "/admin/blog" },
   { name: "Users", icon: Users, path: "/admin/users" },

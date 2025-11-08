@@ -36,6 +36,7 @@ import AdminOutreach from "./pages/admin/Outreach";
 import AdminVolunteers from "./pages/admin/Volunteers";
 import AdminHeroSettings from "./pages/admin/HeroSettings";
 import AdminFooterSettings from "./pages/admin/FooterSettings";
+import AdminFundraisingAnalytics from "./pages/admin/FundraisingAnalytics";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient();
@@ -74,6 +75,7 @@ const App = () => (
           <Route path="/admin/donations" element={<AdminLayout><AdminDonations /></AdminLayout>} />
           <Route path="/admin/payment-methods" element={<AdminLayout><AdminPaymentMethods /></AdminLayout>} />
           <Route path="/admin/campaigns" element={<AdminLayout><AdminCampaigns /></AdminLayout>} />
+          <Route path="/admin/fundraising-analytics" element={<AdminLayout><AdminFundraisingAnalytics /></AdminLayout>} />
           <Route path="/admin/blog" element={<AdminLayout><AdminBlog /></AdminLayout>} />
           <Route path="/admin/users" element={<AdminLayout><AdminUsers /></AdminLayout>} />
           <Route path="/admin/sunday-school" element={<AdminLayout><AdminSundaySchool /></AdminLayout>} />
