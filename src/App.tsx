@@ -37,6 +37,7 @@ import AdminVolunteers from "./pages/admin/Volunteers";
 import AdminHeroSettings from "./pages/admin/HeroSettings";
 import AdminFooterSettings from "./pages/admin/FooterSettings";
 import AdminFundraisingAnalytics from "./pages/admin/FundraisingAnalytics";
+import AdminAdvertisements from "./pages/admin/Advertisements";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 const queryClient = new QueryClient();
@@ -81,6 +82,7 @@ const App = () => (
           <Route path="/admin/sunday-school" element={<AdminLayout><AdminSundaySchool /></AdminLayout>} />
           <Route path="/admin/sunday-school-content" element={<AdminLayout><AdminSundaySchoolContent /></AdminLayout>} />
           <Route path="/admin/class-visits" element={<AdminLayout><AdminClassVisits /></AdminLayout>} />
+          <Route path="/admin/advertisements" element={<AdminLayout><AdminAdvertisements /></AdminLayout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
