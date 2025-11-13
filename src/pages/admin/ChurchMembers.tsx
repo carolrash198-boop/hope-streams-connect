@@ -116,22 +116,45 @@ const ChurchMembers = () => {
 
   const handleCreate = async () => {
     if (!formData.church_id || !formData.first_name || !formData.last_name) {
-      toast.error("Please fill in all required fields");
+      toast.error("Please fill in all required fields (Church, First Name, Last Name)");
       return;
     }
 
     try {
-      const { error } = await supabase.from("church_members").insert([formData]);
+      // Prepare data for insertion - only include non-empty values
+      const insertData: any = {
+        church_id: formData.church_id,
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        membership_date: formData.membership_date,
+        is_active: true,
+      };
 
-      if (error) throw error;
+      // Only add optional fields if they have values
+      if (formData.email?.trim()) insertData.email = formData.email.trim();
+      if (formData.phone?.trim()) insertData.phone = formData.phone.trim();
+      if (formData.date_of_birth) insertData.date_of_birth = formData.date_of_birth;
+      if (formData.gender) insertData.gender = formData.gender;
+      if (formData.marital_status) insertData.marital_status = formData.marital_status;
+      if (formData.address?.trim()) insertData.address = formData.address.trim();
+      if (formData.occupation?.trim()) insertData.occupation = formData.occupation.trim();
+      if (formData.baptism_date) insertData.baptism_date = formData.baptism_date;
+      if (formData.notes?.trim()) insertData.notes = formData.notes.trim();
+
+      const { error } = await supabase.from("church_members").insert([insertData]);
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
 
       toast.success("Member added successfully");
       setCreateDialogOpen(false);
       resetForm();
       fetchMembers();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating member:", error);
-      toast.error("Failed to add member");
+      toast.error(error.message || "Failed to add member");
     }
   };
 
