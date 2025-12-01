@@ -71,87 +71,130 @@ const Services = () => {
   const handleScheduleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log("Current user:", user?.id);
+      
       if (editingItem) {
+        console.log("Updating schedule:", editingItem.id, scheduleForm);
         const { error } = await supabase
           .from("service_schedules")
           .update(scheduleForm)
           .eq("id", editingItem.id);
-        if (error) throw error;
+        if (error) {
+          console.error("Update error:", error);
+          throw new Error(`Update failed: ${error.message}${error.hint ? ` (${error.hint})` : ''}`);
+        }
         toast.success("Schedule updated");
       } else {
+        console.log("Inserting schedule:", scheduleForm);
         const { error } = await supabase
           .from("service_schedules")
           .insert([scheduleForm]);
-        if (error) throw error;
+        if (error) {
+          console.error("Insert error:", error);
+          throw new Error(`Insert failed: ${error.message}${error.hint ? ` (${error.hint})` : ''}`);
+        }
         toast.success("Schedule added");
       }
       setDialogOpen(false);
       resetForms();
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.message);
+      console.error("Schedule submit error:", error);
+      toast.error(error.message || "Operation failed. Check console for details.");
     }
   };
 
   const handleFeatureSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log("Current user:", user?.id);
+      
       if (editingItem) {
+        console.log("Updating feature:", editingItem.id, featureForm);
         const { error } = await supabase
           .from("service_features")
           .update(featureForm)
           .eq("id", editingItem.id);
-        if (error) throw error;
+        if (error) {
+          console.error("Update error:", error);
+          throw new Error(`Update failed: ${error.message}${error.hint ? ` (${error.hint})` : ''}`);
+        }
         toast.success("Feature updated");
       } else {
+        console.log("Inserting feature:", featureForm);
         const { error } = await supabase
           .from("service_features")
           .insert([featureForm]);
-        if (error) throw error;
+        if (error) {
+          console.error("Insert error:", error);
+          throw new Error(`Insert failed: ${error.message}${error.hint ? ` (${error.hint})` : ''}`);
+        }
         toast.success("Feature added");
       }
       setDialogOpen(false);
       resetForms();
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.message);
+      console.error("Feature submit error:", error);
+      toast.error(error.message || "Operation failed. Check console for details.");
     }
   };
 
   const handleKidsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log("Current user:", user?.id);
+      
       if (editingItem) {
+        console.log("Updating kids program:", editingItem.id, kidsForm);
         const { error } = await supabase
           .from("kids_programs")
           .update(kidsForm)
           .eq("id", editingItem.id);
-        if (error) throw error;
+        if (error) {
+          console.error("Update error:", error);
+          throw new Error(`Update failed: ${error.message}${error.hint ? ` (${error.hint})` : ''}`);
+        }
         toast.success("Program updated");
       } else {
+        console.log("Inserting kids program:", kidsForm);
         const { error } = await supabase
           .from("kids_programs")
           .insert([kidsForm]);
-        if (error) throw error;
+        if (error) {
+          console.error("Insert error:", error);
+          throw new Error(`Insert failed: ${error.message}${error.hint ? ` (${error.hint})` : ''}`);
+        }
         toast.success("Program added");
       }
       setDialogOpen(false);
       resetForms();
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.message);
+      console.error("Kids program submit error:", error);
+      toast.error(error.message || "Operation failed. Check console for details.");
     }
   };
 
   const handleDelete = async (table: string, id: string) => {
     if (!confirm("Are you sure you want to delete this item?")) return;
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log("Deleting from", table, "with user:", user?.id);
+      
       const { error } = await supabase.from(table as any).delete().eq("id", id);
-      if (error) throw error;
+      if (error) {
+        console.error("Delete error:", error);
+        throw new Error(`Delete failed: ${error.message}${error.hint ? ` (${error.hint})` : ''}`);
+      }
       toast.success("Item deleted");
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.message);
+      console.error("Delete error:", error);
+      toast.error(error.message || "Delete failed. Check console for details.");
     }
   };
 
