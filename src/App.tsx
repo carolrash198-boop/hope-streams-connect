@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { VideoPlayerProvider } from "./contexts/VideoPlayerContext";
 import { VideoPlayerModal } from "./components/VideoPlayerModal";
 import { PWAUpdatePrompt } from "./components/PWAUpdatePrompt";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import SundaySchool from "./pages/SundaySchool";
@@ -55,6 +56,7 @@ const App = () => (
         <Sonner />
         <VideoPlayerModal />
         <PWAUpdatePrompt />
+        <PWAInstallPrompt />
         <BrowserRouter>
           <Routes>
           <Route path="/" element={<Index />} />
