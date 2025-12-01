@@ -71,14 +71,20 @@ const SundaySchool = () => {
           .update(formData)
           .eq("id", editingClass.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Update error:", error);
+          throw error;
+        }
         toast.success("Class updated successfully");
       } else {
         const { error } = await supabase
           .from("sunday_school_classes")
           .insert([formData]);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Insert error:", error);
+          throw error;
+        }
         toast.success("Class created successfully");
       }
 
@@ -86,7 +92,8 @@ const SundaySchool = () => {
       resetForm();
       fetchClasses();
     } catch (error: any) {
-      toast.error(error.message);
+      console.error("Submit error:", error);
+      toast.error(error.message || "Failed to save class. Please check your permissions.");
     } finally {
       setLoading(false);
     }
@@ -101,7 +108,8 @@ const SundaySchool = () => {
       .eq("id", id);
 
     if (error) {
-      toast.error("Failed to delete class");
+      console.error("Delete error:", error);
+      toast.error(error.message || "Failed to delete class. Please check your permissions.");
     } else {
       toast.success("Class deleted successfully");
       fetchClasses();

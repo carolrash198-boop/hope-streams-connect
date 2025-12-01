@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { VideoPlayerProvider } from "./contexts/VideoPlayerContext";
 import { VideoPlayerModal } from "./components/VideoPlayerModal";
+import { PWAUpdatePrompt } from "./components/PWAUpdatePrompt";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import SundaySchool from "./pages/SundaySchool";
@@ -53,6 +54,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <VideoPlayerModal />
+        <PWAUpdatePrompt />
         <BrowserRouter>
           <Routes>
           <Route path="/" element={<Index />} />
