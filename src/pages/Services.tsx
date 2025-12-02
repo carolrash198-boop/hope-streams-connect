@@ -249,7 +249,7 @@ const Services = () => {
                     <Link to="/contact">Contact Us</Link>
                   </Button>
                   <Button asChild variant="outline">
-                    <a href="tel:+1234567890">Call (123) 456-7890</a>
+                    <a href="tel:+254 722570556">Call +254 722570556</a>
                   </Button>
                 </div>
               </div>
