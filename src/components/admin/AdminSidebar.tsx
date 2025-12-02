@@ -52,6 +52,7 @@ const sidebarGroups: SidebarGroup[] = [
     items: [
       { title: "Hero Settings", icon: Settings, href: "/admin/hero-settings" },
       { title: "Footer Settings", icon: Settings, href: "/admin/footer-settings" },
+      { title: "Contact Settings", icon: MessageSquare, href: "/admin/contact-settings" },
       { title: "Advertisements", icon: Megaphone, href: "/admin/advertisements" },
       { title: "Blog", icon: FileText, href: "/admin/blog" },
       { title: "Gallery", icon: Image, href: "/admin/gallery" },
