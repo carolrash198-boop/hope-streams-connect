@@ -528,23 +528,58 @@ const Contact = () => {
 
             {pageSettings.church_locations.length > 0 ? (
                 <div className="space-y-8">
-                {/* Map showing all church locations */}
-                {pageSettings.church_locations[0] && (() => {
-                  const location = pageSettings.church_locations[0];
-                  let embedUrl = location.map_embed_url || '';
+                {/* Map showing all church locations with markers */}
+                {(() => {
+                  const validLocations = pageSettings.church_locations.filter(
+                    loc => loc.latitude && loc.longitude
+                  );
                   
-                  // Extract URL from iframe if full iframe HTML is present
-                  const srcMatch = embedUrl.match(/src=["']([^"']+)["']/);
-                  if (srcMatch) {
-                    embedUrl = srcMatch[1];
+                  if (validLocations.length === 0) return null;
+                  
+                  let embedUrl = '';
+                  
+                  if (validLocations.length === 1) {
+                    // Single location - use embed URL or coordinates
+                    const location = validLocations[0];
+                    embedUrl = location.map_embed_url || '';
+                    
+                    const srcMatch = embedUrl.match(/src=["']([^"']+)["']/);
+                    if (srcMatch) {
+                      embedUrl = srcMatch[1];
+                    }
+                    
+                    if (!embedUrl) {
+                      embedUrl = `https://maps.google.com/maps?q=${location.latitude},${location.longitude}&z=13&output=embed`;
+                    }
+                  } else {
+                    // Multiple locations - calculate center and add markers
+                    const centerLat = validLocations.reduce((sum, loc) => sum + loc.latitude, 0) / validLocations.length;
+                    const centerLng = validLocations.reduce((sum, loc) => sum + loc.longitude, 0) / validLocations.length;
+                    
+                    // Calculate zoom level based on spread of locations
+                    const latitudes = validLocations.map(loc => loc.latitude);
+                    const longitudes = validLocations.map(loc => loc.longitude);
+                    const latSpread = Math.max(...latitudes) - Math.min(...latitudes);
+                    const lngSpread = Math.max(...longitudes) - Math.min(...longitudes);
+                    const maxSpread = Math.max(latSpread, lngSpread);
+                    
+                    // Determine appropriate zoom level
+                    let zoom = 10;
+                    if (maxSpread < 0.05) zoom = 13;
+                    else if (maxSpread < 0.1) zoom = 12;
+                    else if (maxSpread < 0.5) zoom = 10;
+                    else if (maxSpread < 1) zoom = 9;
+                    else zoom = 8;
+                    
+                    // Create markers with labels
+                    const markers = validLocations
+                      .map((loc, idx) => `markers=color:red%7Clabel:${idx + 1}%7C${loc.latitude},${loc.longitude}`)
+                      .join('&');
+                    
+                    embedUrl = `https://maps.google.com/maps?q=${centerLat},${centerLng}&z=${zoom}&${markers}&output=embed`;
                   }
                   
-                  // Fallback to lat/long if no embed URL
-                  if (!embedUrl && location.latitude && location.longitude) {
-                    embedUrl = `https://maps.google.com/maps?q=${location.latitude},${location.longitude}&z=13&output=embed`;
-                  }
-                  
-                  return embedUrl ? (
+                  return (
                     <Card className="overflow-hidden">
                       <CardContent className="p-0">
                         <div className="aspect-video rounded-lg overflow-hidden">
@@ -556,16 +591,22 @@ const Contact = () => {
                             allowFullScreen
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
-                            title="Church location map"
+                            title="Church locations map"
                           />
                         </div>
                       </CardContent>
                     </Card>
-                  ) : null;
+                  );
                 })()}
 
                 {/* Location Cards with click to view details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <div className="mb-4 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Click on any location card below for details and directions
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {pageSettings.church_locations.map((location, index) => (
                     <Card 
                       key={index} 
@@ -574,11 +615,14 @@ const Contact = () => {
                     >
                       <CardContent className="p-6">
                         <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <MapPin className="h-5 w-5 text-primary" />
+                          <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                            <span className="text-sm font-bold text-red-600 dark:text-red-400">{index + 1}</span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold mb-1">{location.name}</h3>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold">{location.name}</h3>
+                              <Badge variant="outline" className="text-xs">Pin {index + 1}</Badge>
+                            </div>
                             <p className="text-sm text-muted-foreground mb-3">
                               {location.address}
                             </p>
@@ -603,6 +647,7 @@ const Contact = () => {
                       </CardContent>
                     </Card>
                   ))}
+                  </div>
                 </div>
               </div>
             ) : (
