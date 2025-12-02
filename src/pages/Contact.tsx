@@ -528,20 +528,35 @@ const Contact = () => {
 
             {pageSettings.church_locations.length > 0 ? (
                 <div className="space-y-8">
-                {/* Single Map with Primary Location or First Location */}
-                {pageSettings.church_locations[0] && (() => {
-                  const location = pageSettings.church_locations[0];
-                  let embedUrl = location.map_embed_url || '';
+                {/* Map showing all church locations */}
+                {(() => {
+                  let embedUrl = '';
                   
-                  // Extract URL from iframe if full iframe HTML is present
-                  const srcMatch = embedUrl.match(/src=["']([^"']+)["']/);
-                  if (srcMatch) {
-                    embedUrl = srcMatch[1];
-                  }
-                  
-                  // Fallback to lat/long if no embed URL
-                  if (!embedUrl && location.latitude && location.longitude) {
-                    embedUrl = `https://maps.google.com/maps?q=${location.latitude},${location.longitude}&z=15&output=embed`;
+                  if (pageSettings.church_locations.length === 1) {
+                    // Single location - use its embed URL or coordinates
+                    const location = pageSettings.church_locations[0];
+                    embedUrl = location.map_embed_url || '';
+                    
+                    // Extract URL from iframe if full iframe HTML is present
+                    const srcMatch = embedUrl.match(/src=["']([^"']+)["']/);
+                    if (srcMatch) {
+                      embedUrl = srcMatch[1];
+                    }
+                    
+                    // Fallback to lat/long
+                    if (!embedUrl && location.latitude && location.longitude) {
+                      embedUrl = `https://maps.google.com/maps?q=${location.latitude},${location.longitude}&z=15&output=embed`;
+                    }
+                  } else {
+                    // Multiple locations - show all with markers using directions API format
+                    const coordinates = pageSettings.church_locations
+                      .filter(loc => loc.latitude && loc.longitude)
+                      .map(loc => `${loc.latitude},${loc.longitude}`)
+                      .join('/');
+                    
+                    if (coordinates) {
+                      embedUrl = `https://maps.google.com/maps/dir/${coordinates}?output=embed`;
+                    }
                   }
                   
                   return (
@@ -566,51 +581,46 @@ const Contact = () => {
 
                 {/* Location Cards with click to view details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {pageSettings.church_locations.map((location, index) => (
-                    <Card 
-                      key={index} 
-                      className="cursor-pointer hover:shadow-lg transition-shadow"
-                      onClick={() => setSelectedLocation(location)}
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <MapPin className="h-5 w-5 text-primary" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold mb-1">{location.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {location.address}
-                            </p>
-                            {location.phone && (
-                              <p className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
-                                <Phone className="h-3 w-3" />
-                                {location.phone}
+                  {pageSettings.church_locations.map((location, index) => {
+                    // Get senior pastor phone (first pastor in the list)
+                    const seniorPastorPhone = pageSettings.pastoral_staff.length > 0 
+                      ? pageSettings.pastoral_staff[0].phone 
+                      : pageSettings.main_phone;
+                    
+                    return (
+                      <Card 
+                        key={index} 
+                        className="cursor-pointer hover:shadow-lg transition-shadow"
+                        onClick={() => setSelectedLocation(location)}
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <MapPin className="h-5 w-5 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold mb-1">{location.name}</h3>
+                              <p className="text-sm text-muted-foreground mb-3">
+                                {location.address}
                               </p>
-                            )}
-                            {location.email && (
-                              <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                                <Mail className="h-3 w-3" />
-                                {location.email}
-                              </p>
-                            )}
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="w-full mt-2"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(`https://www.google.com/maps/dir/?api=1&destination=${location.latitude},${location.longitude}`, '_blank');
-                              }}
-                            >
-                              <MapPin className="h-3 w-3 mr-1" />
-                              Get Directions
-                            </Button>
+                              <div className="bg-accent/10 rounded-lg p-3 border border-accent/20">
+                                <p className="text-xs font-medium text-accent mb-1">Need help finding us?</p>
+                                <a 
+                                  href={`tel:${seniorPastorPhone.replace(/[^\d+]/g, '')}`}
+                                  className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Phone className="h-4 w-4" />
+                                  {seniorPastorPhone}
+                                </a>
+                                <p className="text-xs text-muted-foreground mt-1">Call Senior Pastor</p>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
             ) : (
