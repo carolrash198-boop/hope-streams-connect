@@ -683,14 +683,21 @@ const ContactSettingsPage = () => {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label>Google Maps Embed URL</Label>
-                        <Input
-                          placeholder="Paste the iframe src URL from Google Maps"
+                        <Label>Google Maps Embed Code or URL</Label>
+                        <Textarea
+                          placeholder='Paste the entire iframe code: <iframe src="https://..." ...></iframe> or just the URL'
                           value={location.map_embed_url}
-                          onChange={(e) => updateChurchLocation(index, 'map_embed_url', e.target.value)}
+                          onChange={(e) => {
+                            const input = e.target.value.trim();
+                            // Extract src URL from iframe if full iframe is pasted
+                            const srcMatch = input.match(/src=["']([^"']+)["']/);
+                            const url = srcMatch ? srcMatch[1] : input;
+                            updateChurchLocation(index, 'map_embed_url', url);
+                          }}
+                          className="h-24 font-mono text-sm"
                         />
                         <p className="text-xs text-muted-foreground">
-                          Get this from Google Maps: Share → Embed a map → Copy the URL inside src="..."
+                          Get this from Google Maps → Share → Embed a map → Copy the entire iframe code or just the src URL
                         </p>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
