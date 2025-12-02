@@ -29,6 +29,12 @@ interface PastoralStaff {
   specialties: string[];
 }
 
+interface ChurchLocation {
+  name: string;
+  address: string;
+  map_embed_url: string;
+}
+
 interface ContactPageSettings {
   id?: string;
   hero_heading: string;
@@ -47,6 +53,7 @@ interface ContactPageSettings {
   service_hours: ServiceHour[];
   office_hours: OfficeHour[];
   pastoral_staff: PastoralStaff[];
+  church_locations: ChurchLocation[];
   emergency_contact_text: string;
   is_active: boolean;
 }
@@ -72,6 +79,7 @@ const ContactSettingsPage = () => {
     service_hours: [],
     office_hours: [],
     pastoral_staff: [],
+    church_locations: [],
     emergency_contact_text: "For urgent pastoral care, call our 24/7 prayer line at",
     is_active: true
   });
@@ -95,7 +103,8 @@ const ContactSettingsPage = () => {
           ...data,
           service_hours: data.service_hours as unknown as ServiceHour[],
           office_hours: data.office_hours as unknown as OfficeHour[],
-          pastoral_staff: data.pastoral_staff as unknown as PastoralStaff[]
+          pastoral_staff: data.pastoral_staff as unknown as PastoralStaff[],
+          church_locations: (data.church_locations as unknown as ChurchLocation[]) || []
         });
       }
     } catch (error) {
@@ -118,6 +127,7 @@ const ContactSettingsPage = () => {
         service_hours: settings.service_hours as any,
         office_hours: settings.office_hours as any,
         pastoral_staff: settings.pastoral_staff as any,
+        church_locations: settings.church_locations as any,
         updated_at: new Date().toISOString()
       };
 
@@ -232,6 +242,34 @@ const ContactSettingsPage = () => {
     }));
   };
 
+  // Church Locations Management
+  const addChurchLocation = () => {
+    setSettings(prev => ({
+      ...prev,
+      church_locations: [...prev.church_locations, { 
+        name: "", 
+        address: "", 
+        map_embed_url: "" 
+      }]
+    }));
+  };
+
+  const removeChurchLocation = (index: number) => {
+    setSettings(prev => ({
+      ...prev,
+      church_locations: prev.church_locations.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateChurchLocation = (index: number, field: keyof ChurchLocation, value: string) => {
+    setSettings(prev => ({
+      ...prev,
+      church_locations: prev.church_locations.map((item, i) => 
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+
   if (loading) {
     return (
       <AdminLayout>
@@ -266,6 +304,7 @@ const ContactSettingsPage = () => {
             <TabsTrigger value="stats">Quick Stats</TabsTrigger>
             <TabsTrigger value="hours">Hours</TabsTrigger>
             <TabsTrigger value="staff">Pastoral Staff</TabsTrigger>
+            <TabsTrigger value="locations">Church Locations</TabsTrigger>
           </TabsList>
 
           <TabsContent value="hero" className="space-y-4">
@@ -569,6 +608,71 @@ const ContactSettingsPage = () => {
                     </div>
                   </div>
                 ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="locations" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Church Locations & Maps</span>
+                  <Button onClick={addChurchLocation} size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Location
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {settings.church_locations.map((location, index) => (
+                  <div key={index} className="border rounded-lg p-4 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-semibold">Location {index + 1}</h3>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => removeChurchLocation(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Church Name</Label>
+                        <Input
+                          placeholder="e.g., Main Church - Baringo"
+                          value={location.name}
+                          onChange={(e) => updateChurchLocation(index, 'name', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Address</Label>
+                        <Input
+                          placeholder="e.g., 123 Faith Street, Baringo"
+                          value={location.address}
+                          onChange={(e) => updateChurchLocation(index, 'address', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2 col-span-2">
+                        <Label>Google Maps Embed URL</Label>
+                        <Textarea
+                          placeholder='Paste the Google Maps embed iframe src URL here (e.g., https://www.google.com/maps/embed?pb=...)'
+                          value={location.map_embed_url}
+                          onChange={(e) => updateChurchLocation(index, 'map_embed_url', e.target.value)}
+                          rows={3}
+                        />
+                        <p className="text-sm text-muted-foreground">
+                          Get this from Google Maps → Share → Embed a map → Copy the src URL from the iframe
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {settings.church_locations.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">
+                    No church locations added yet. Click "Add Location" to get started.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
