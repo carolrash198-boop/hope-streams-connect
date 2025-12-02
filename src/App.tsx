@@ -72,7 +72,7 @@ const App = () => (
           <Route path="/admin/dashboard" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
           <Route path="/admin/hero-settings" element={<AdminLayout><AdminHeroSettings /></AdminLayout>} />
           <Route path="/admin/footer-settings" element={<AdminLayout><AdminFooterSettings /></AdminLayout>} />
-          <Route path="/admin/contact-settings" element={<AdminLayout><AdminContactSettings /></AdminLayout>} />
+          <Route path="/admin/contact-settings" element={<AdminContactSettings />} />
           <Route path="/admin/services" element={<AdminLayout><AdminServices /></AdminLayout>} />
           <Route path="/admin/events" element={<AdminLayout><AdminEvents /></AdminLayout>} />
           <Route path="/admin/sermons" element={<AdminLayout><AdminSermons /></AdminLayout>} />

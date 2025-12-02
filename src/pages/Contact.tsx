@@ -45,6 +45,7 @@ const Contact = () => {
     service_hours: [] as Array<{ day: string; times: string; service: string }>,
     office_hours: [] as Array<{ day: string; times: string }>,
     pastoral_staff: [] as Array<{ name: string; role: string; email: string; phone: string; specialties: string[] }>,
+    church_locations: [] as Array<{ name: string; address: string; map_embed_url: string }>,
     emergency_contact_text: "For urgent pastoral care, call our 24/7 prayer line at"
   });
   const [formData, setFormData] = useState({
@@ -129,7 +130,8 @@ const Contact = () => {
             ...data,
             service_hours: data.service_hours as unknown as Array<{ day: string; times: string; service: string }>,
             office_hours: data.office_hours as unknown as Array<{ day: string; times: string }>,
-            pastoral_staff: data.pastoral_staff as unknown as Array<{ name: string; role: string; email: string; phone: string; specialties: string[] }>
+            pastoral_staff: data.pastoral_staff as unknown as Array<{ name: string; role: string; email: string; phone: string; specialties: string[] }>,
+            church_locations: (data.church_locations as unknown as Array<{ name: string; address: string; map_embed_url: string }>) || []
           });
         }
       } catch (error) {
@@ -523,26 +525,68 @@ const Contact = () => {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="mb-6">Find Us</h2>
+              <h2 className="mb-6">Our Church Locations</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Located in the heart of Hope City, easily accessible by car or public transportation.
+                {pageSettings.church_locations.length > 0 
+                  ? `Visit any of our ${pageSettings.church_locations.length} locations. All are welcome!`
+                  : "Located in the heart of the community, easily accessible by car or public transportation."}
               </p>
             </div>
 
-            <div className="aspect-video bg-muted rounded-2xl flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">Interactive Map</h3>
-                <p className="text-muted-foreground mb-4">
-                  123 Faith Street, Hope City, HC 12345
-                </p>
-                <Button asChild>
-                  <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer">
-                    Open in Google Maps
-                  </a>
-                </Button>
+            {pageSettings.church_locations.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {pageSettings.church_locations.map((location, index) => (
+                  <Card key={index} className="overflow-hidden">
+                    <CardHeader>
+                      <CardTitle className="flex items-start gap-2">
+                        <MapPin className="h-5 w-5 mt-1 text-primary flex-shrink-0" />
+                        <div>
+                          <div className="font-semibold">{location.name}</div>
+                          <p className="text-sm text-muted-foreground font-normal mt-1">
+                            {location.address}
+                          </p>
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {location.map_embed_url ? (
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            src={location.map_embed_url}
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0 }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title={`Map of ${location.name}`}
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                          <p className="text-muted-foreground">Map not available</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className="aspect-video bg-muted rounded-2xl flex items-center justify-center">
+                <div className="text-center">
+                  <MapPin className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-xl font-semibold mb-2">Interactive Map</h3>
+                  <p className="text-muted-foreground mb-4">
+                    {pageSettings.address_line1}, {pageSettings.address_line2}
+                  </p>
+                  <Button asChild>
+                    <a href={pageSettings.maps_url} target="_blank" rel="noopener noreferrer">
+                      Open in Google Maps
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            )}
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
               <div>

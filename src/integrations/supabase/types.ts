@@ -408,6 +408,7 @@ export type Database = {
         Row: {
           address_line1: string
           address_line2: string
+          church_locations: Json | null
           created_at: string | null
           created_by: string | null
           days_per_week: string
@@ -432,6 +433,7 @@ export type Database = {
         Insert: {
           address_line1?: string
           address_line2?: string
+          church_locations?: Json | null
           created_at?: string | null
           created_by?: string | null
           days_per_week?: string
@@ -456,6 +458,7 @@ export type Database = {
         Update: {
           address_line1?: string
           address_line2?: string
+          church_locations?: Json | null
           created_at?: string | null
           created_by?: string | null
           days_per_week?: string
