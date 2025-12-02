@@ -34,6 +34,9 @@ interface ChurchLocation {
   address: string;
   latitude: number;
   longitude: number;
+  map_embed_url: string;
+  phone?: string;
+  email?: string;
 }
 
 interface ContactPageSettings {
@@ -251,7 +254,10 @@ const ContactSettingsPage = () => {
         name: "", 
         address: "", 
         latitude: 0,
-        longitude: 0
+        longitude: 0,
+        map_embed_url: "",
+        phone: "",
+        email: ""
       }]
     }));
   };
@@ -659,6 +665,36 @@ const ContactSettingsPage = () => {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
+                          <Label>Phone (Optional)</Label>
+                          <Input
+                            placeholder="e.g., +254 123 456 789"
+                            value={location.phone || ""}
+                            onChange={(e) => updateChurchLocation(index, 'phone', e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Email (Optional)</Label>
+                          <Input
+                            type="email"
+                            placeholder="e.g., branch@church.com"
+                            value={location.email || ""}
+                            onChange={(e) => updateChurchLocation(index, 'email', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Google Maps Embed URL</Label>
+                        <Input
+                          placeholder="Paste the iframe src URL from Google Maps"
+                          value={location.map_embed_url}
+                          onChange={(e) => updateChurchLocation(index, 'map_embed_url', e.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Get this from Google Maps: Share → Embed a map → Copy the URL inside src="..."
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
                           <Label>Latitude</Label>
                           <Input
                             type="number"
@@ -678,11 +714,6 @@ const ContactSettingsPage = () => {
                             onChange={(e) => updateChurchLocation(index, 'longitude', parseFloat(e.target.value) || 0)}
                           />
                         </div>
-                      </div>
-                      <div className="bg-muted/50 p-3 rounded-lg">
-                        <p className="text-xs text-muted-foreground">
-                          <strong>How to find coordinates:</strong> Open Google Maps → Right-click on your church location → Click the coordinates at the top to copy them
-                        </p>
                       </div>
                     </div>
                   </div>
