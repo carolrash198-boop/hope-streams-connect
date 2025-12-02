@@ -548,18 +548,27 @@ const Contact = () => {
                       embedUrl = `https://maps.google.com/maps?q=${location.latitude},${location.longitude}&z=15&output=embed`;
                     }
                   } else {
-                    // Multiple locations - show all with markers using directions API format
-                    const coordinates = pageSettings.church_locations
-                      .filter(loc => loc.latitude && loc.longitude)
-                      .map(loc => `${loc.latitude},${loc.longitude}`)
-                      .join('/');
+                    // Multiple locations - calculate center and show with markers
+                    const validLocations = pageSettings.church_locations.filter(loc => loc.latitude && loc.longitude);
                     
-                    if (coordinates) {
-                      embedUrl = `https://maps.google.com/maps/dir/${coordinates}?output=embed`;
+                    if (validLocations.length > 0) {
+                      // Calculate center point
+                      const centerLat = validLocations.reduce((sum, loc) => sum + loc.latitude, 0) / validLocations.length;
+                      const centerLng = validLocations.reduce((sum, loc) => sum + loc.longitude, 0) / validLocations.length;
+                      
+                      // Create markers string
+                      const markers = validLocations
+                        .map(loc => `markers=color:red%7C${loc.latitude},${loc.longitude}`)
+                        .join('&');
+                      
+                      // Zoom level adjusted to show all locations (lower zoom = more zoomed out)
+                      const zoom = validLocations.length > 3 ? 10 : 12;
+                      
+                      embedUrl = `https://maps.google.com/maps?q=${centerLat},${centerLng}&z=${zoom}&${markers}&output=embed`;
                     }
                   }
                   
-                  return (
+                  return embedUrl ? (
                     <Card className="overflow-hidden">
                       <CardContent className="p-0">
                         <div className="aspect-video rounded-lg overflow-hidden">
@@ -576,7 +585,7 @@ const Contact = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  );
+                  ) : null;
                 })()}
 
                 {/* Location Cards with click to view details */}
