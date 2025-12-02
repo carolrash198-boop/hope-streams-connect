@@ -10,19 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Clock, 
-  Calendar, 
-  User, 
-  Send, 
-  Heart,
-  Users,
-  BookOpen,
-  Headphones
-} from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Users, Heart, AlertCircle, Calendar, User, Send } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -45,9 +34,13 @@ const Contact = () => {
     service_hours: [] as Array<{ day: string; times: string; service: string }>,
     office_hours: [] as Array<{ day: string; times: string }>,
     pastoral_staff: [] as Array<{ name: string; role: string; email: string; phone: string; specialties: string[] }>,
-    church_locations: [] as Array<{ name: string; address: string; latitude: number; longitude: number }>,
+    church_locations: [] as Array<{ name: string; address: string; latitude: number; longitude: number; map_embed_url: string; phone?: string; email?: string }>,
     emergency_contact_text: "For urgent pastoral care, call our 24/7 prayer line at"
   });
+
+  const [selectedLocation, setSelectedLocation] = useState<{ name: string; address: string; latitude: number; longitude: number; map_embed_url: string; phone?: string; email?: string } | null>(null);
+  const [userLocation, setUserLocation] = useState("");
+  const [showDirections, setShowDirections] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -131,7 +124,7 @@ const Contact = () => {
             service_hours: data.service_hours as unknown as Array<{ day: string; times: string; service: string }>,
             office_hours: data.office_hours as unknown as Array<{ day: string; times: string }>,
             pastoral_staff: data.pastoral_staff as unknown as Array<{ name: string; role: string; email: string; phone: string; specialties: string[] }>,
-            church_locations: (data.church_locations as unknown as Array<{ name: string; address: string; latitude: number; longitude: number }>) || []
+            church_locations: (data.church_locations as unknown as Array<{ name: string; address: string; latitude: number; longitude: number; map_embed_url: string; phone?: string; email?: string }>) || []
           });
         }
       } catch (error) {
@@ -534,7 +527,7 @@ const Contact = () => {
             </div>
 
             {pageSettings.church_locations.length > 0 ? (
-              <div className="space-y-8">
+                <div className="space-y-8">
                 {/* Single Map with All Locations */}
                 <Card className="overflow-hidden">
                   <CardContent className="p-0">
@@ -555,10 +548,14 @@ const Contact = () => {
                   </CardContent>
                 </Card>
 
-                {/* Location List */}
+                {/* Location Cards with click to view details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {pageSettings.church_locations.map((location, index) => (
-                    <Card key={index}>
+                    <Card 
+                      key={index} 
+                      className="cursor-pointer hover:shadow-lg transition-shadow"
+                      onClick={() => setSelectedLocation(location)}
+                    >
                       <CardContent className="p-6">
                         <div className="flex items-start gap-3">
                           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -566,17 +563,32 @@ const Contact = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold mb-1">{location.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-3">
+                            <p className="text-sm text-muted-foreground mb-2">
                               {location.address}
                             </p>
-                            <Button asChild variant="outline" size="sm" className="w-full">
-                              <a 
-                                href={`https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                Get Directions
-                              </a>
+                            {location.phone && (
+                              <p className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
+                                <Phone className="h-3 w-3" />
+                                {location.phone}
+                              </p>
+                            )}
+                            {location.email && (
+                              <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+                                <Mail className="h-3 w-3" />
+                                {location.email}
+                              </p>
+                            )}
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="w-full mt-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(`https://www.google.com/maps/dir/?api=1&destination=${location.latitude},${location.longitude}`, '_blank');
+                              }}
+                            >
+                              <MapPin className="h-3 w-3 mr-1" />
+                              Get Directions
                             </Button>
                           </div>
                         </div>
@@ -586,44 +598,131 @@ const Contact = () => {
                 </div>
               </div>
             ) : (
-              <div className="aspect-video bg-muted rounded-2xl flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-xl font-semibold mb-2">Interactive Map</h3>
-                  <p className="text-muted-foreground mb-4">
-                    {pageSettings.address_line1}, {pageSettings.address_line2}
-                  </p>
-                  <Button asChild>
-                    <a href={pageSettings.maps_url} target="_blank" rel="noopener noreferrer">
-                      Open in Google Maps
-                    </a>
-                  </Button>
-                </div>
-              </div>
+              <Card className="overflow-hidden">
+                <CardContent className="p-12 text-center">
+                  <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No locations configured yet</p>
+                </CardContent>
+              </Card>
             )}
-
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div>
-                <h4 className="font-medium mb-2">Parking</h4>
-                <p className="text-sm text-muted-foreground">
-                  Free parking available in our lot and on surrounding streets
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">Public Transit</h4>
-                <p className="text-sm text-muted-foreground">
-                  Bus routes 15 & 23 stop directly in front of the church
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">Accessibility</h4>
-                <p className="text-sm text-muted-foreground">
-                  Wheelchair accessible with ramp entrance and elevator access
-                </p>
-              </div>
-            </div>
           </div>
         </section>
+
+        {/* Location Details Dialog */}
+        <Dialog open={!!selectedLocation} onOpenChange={(open) => !open && setSelectedLocation(null)}>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-primary" />
+                {selectedLocation?.name}
+              </DialogTitle>
+              <DialogDescription>{selectedLocation?.address}</DialogDescription>
+            </DialogHeader>
+            {selectedLocation && (
+              <div className="space-y-4">
+                {/* Map Preview */}
+                <div className="rounded-lg overflow-hidden border">
+                  {selectedLocation.map_embed_url ? (
+                    <iframe
+                      src={selectedLocation.map_embed_url}
+                      width="100%"
+                      height="400"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`${selectedLocation.name} Map`}
+                    />
+                  ) : (
+                    <iframe
+                      src={`https://maps.google.com/maps?q=${selectedLocation.latitude},${selectedLocation.longitude}&z=15&output=embed`}
+                      width="100%"
+                      height="400"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`${selectedLocation.name} Map`}
+                    />
+                  )}
+                </div>
+                
+                {/* Contact Details */}
+                <div className="space-y-3">
+                  {selectedLocation.phone && (
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-5 w-5 text-primary" />
+                      <div>
+                        <p className="text-sm font-medium">Phone</p>
+                        <a href={`tel:${selectedLocation.phone}`} className="text-sm text-muted-foreground hover:text-primary">
+                          {selectedLocation.phone}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedLocation.email && (
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-5 w-5 text-primary" />
+                      <div>
+                        <p className="text-sm font-medium">Email</p>
+                        <a href={`mailto:${selectedLocation.email}`} className="text-sm text-muted-foreground hover:text-primary">
+                          {selectedLocation.email}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button 
+                    className="flex-1"
+                    onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${selectedLocation.latitude},${selectedLocation.longitude}`, '_blank')}
+                  >
+                    <MapPin className="mr-2 h-4 w-4" />
+                    Get Directions
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => setShowDirections(!showDirections)}
+                  >
+                    Calculate Route
+                  </Button>
+                </div>
+
+                {/* Route Calculator */}
+                {showDirections && (
+                  <div className="space-y-3 pt-4 border-t">
+                    <Label>Your Starting Location</Label>
+                    <Input
+                      placeholder="Enter your address, city, or current location"
+                      value={userLocation}
+                      onChange={(e) => setUserLocation(e.target.value)}
+                    />
+                    <Button 
+                      className="w-full"
+                      onClick={() => {
+                        if (userLocation.trim()) {
+                          window.open(
+                            `https://www.google.com/maps/dir/${encodeURIComponent(userLocation)}/${selectedLocation.latitude},${selectedLocation.longitude}`,
+                            '_blank'
+                          );
+                        }
+                      }}
+                      disabled={!userLocation.trim()}
+                    >
+                      View Route, Distance & Time
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Opens Google Maps with full directions, travel time, and distance
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
