@@ -126,12 +126,26 @@ const ContactSettingsPage = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Clean up church locations to ensure only URLs are saved
+      const cleanedLocations = settings.church_locations.map(loc => {
+        let cleanUrl = loc.map_embed_url || '';
+        // Extract URL from iframe if full iframe HTML is present
+        const srcMatch = cleanUrl.match(/src=["']([^"']+)["']/);
+        if (srcMatch) {
+          cleanUrl = srcMatch[1];
+        }
+        return {
+          ...loc,
+          map_embed_url: cleanUrl
+        };
+      });
+
       const dataToSave = {
         ...settings,
         service_hours: settings.service_hours as any,
         office_hours: settings.office_hours as any,
         pastoral_staff: settings.pastoral_staff as any,
-        church_locations: settings.church_locations as any,
+        church_locations: cleanedLocations as any,
         updated_at: new Date().toISOString()
       };
 

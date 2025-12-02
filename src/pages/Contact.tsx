@@ -529,25 +529,40 @@ const Contact = () => {
             {pageSettings.church_locations.length > 0 ? (
                 <div className="space-y-8">
                 {/* Single Map with Primary Location or First Location */}
-                {pageSettings.church_locations[0] && (
-                  <Card className="overflow-hidden">
-                    <CardContent className="p-0">
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <iframe
-                          src={pageSettings.church_locations[0].map_embed_url || 
-                            `https://maps.google.com/maps?q=${pageSettings.church_locations[0].latitude},${pageSettings.church_locations[0].longitude}&z=15&output=embed`}
-                          width="100%"
-                          height="100%"
-                          style={{ border: 0 }}
-                          allowFullScreen
-                          loading="lazy"
-                          referrerPolicy="no-referrer-when-downgrade"
-                          title="Church location map"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                {pageSettings.church_locations[0] && (() => {
+                  const location = pageSettings.church_locations[0];
+                  let embedUrl = location.map_embed_url || '';
+                  
+                  // Extract URL from iframe if full iframe HTML is present
+                  const srcMatch = embedUrl.match(/src=["']([^"']+)["']/);
+                  if (srcMatch) {
+                    embedUrl = srcMatch[1];
+                  }
+                  
+                  // Fallback to lat/long if no embed URL
+                  if (!embedUrl && location.latitude && location.longitude) {
+                    embedUrl = `https://maps.google.com/maps?q=${location.latitude},${location.longitude}&z=15&output=embed`;
+                  }
+                  
+                  return (
+                    <Card className="overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            src={embedUrl}
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0 }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title="Church location map"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })()}
 
                 {/* Location Cards with click to view details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -623,29 +638,33 @@ const Contact = () => {
               <div className="space-y-4">
                 {/* Map Preview */}
                 <div className="rounded-lg overflow-hidden border">
-                  {selectedLocation.map_embed_url ? (
-                    <iframe
-                      src={selectedLocation.map_embed_url}
-                      width="100%"
-                      height="400"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title={`${selectedLocation.name} Map`}
-                    />
-                  ) : (
-                    <iframe
-                      src={`https://maps.google.com/maps?q=${selectedLocation.latitude},${selectedLocation.longitude}&z=15&output=embed`}
-                      width="100%"
-                      height="400"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title={`${selectedLocation.name} Map`}
-                    />
-                  )}
+                  {(() => {
+                    let embedUrl = selectedLocation.map_embed_url || '';
+                    
+                    // Extract URL from iframe if full iframe HTML is present
+                    const srcMatch = embedUrl.match(/src=["']([^"']+)["']/);
+                    if (srcMatch) {
+                      embedUrl = srcMatch[1];
+                    }
+                    
+                    // Fallback to lat/long if no embed URL
+                    if (!embedUrl && selectedLocation.latitude && selectedLocation.longitude) {
+                      embedUrl = `https://maps.google.com/maps?q=${selectedLocation.latitude},${selectedLocation.longitude}&z=15&output=embed`;
+                    }
+                    
+                    return (
+                      <iframe
+                        src={embedUrl}
+                        width="100%"
+                        height="400"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={`${selectedLocation.name} Map`}
+                      />
+                    );
+                  })()}
                 </div>
                 
                 {/* Contact Details */}
