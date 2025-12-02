@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,7 @@ import {
 const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("(123) 456-7890");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -94,6 +95,22 @@ const Contact = () => {
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+    const fetchPhoneNumber = async () => {
+      const { data, error } = await supabase
+        .from('footer_settings')
+        .select('phone')
+        .eq('is_active', true)
+        .single();
+
+      if (!error && data) {
+        setPhoneNumber(data.phone);
+      }
+    };
+
+    fetchPhoneNumber();
+  }, []);
 
   const contactInfo = [
     {
@@ -173,7 +190,7 @@ const Contact = () => {
                 <a href="#contact-form">Send a Message</a>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60">
-                <a href="tel:+1234567890">Call (123) 456-7890</a>
+                <a href={`tel:${phoneNumber.replace(/[^\d+]/g, '')}`}>Call {phoneNumber}</a>
               </Button>
             </div>
           </div>
