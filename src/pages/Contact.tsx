@@ -27,7 +27,26 @@ import {
 const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("(123) 456-7890");
+  const [loading, setLoading] = useState(true);
+  const [pageSettings, setPageSettings] = useState({
+    hero_heading: "Contact Us",
+    hero_subtitle: "We'd love to hear from you! Whether you have questions, need prayer, or want to get involved, we're here to help.",
+    address_line1: "123 Faith Street",
+    address_line2: "Hope City, HC 12345",
+    main_phone: "(123) 456-7890",
+    prayer_line_phone: "(123) 456-7891",
+    main_email: "info@fpfchurch.or.ke",
+    pastor_email: "pastor@fpfchurch.or.ke",
+    maps_url: "https://maps.google.com",
+    response_time: "24 hrs",
+    days_per_week: "7 days",
+    pastoral_staff_count: "3",
+    families_served: "500+",
+    service_hours: [] as Array<{ day: string; times: string; service: string }>,
+    office_hours: [] as Array<{ day: string; times: string }>,
+    pastoral_staff: [] as Array<{ name: string; role: string; email: string; phone: string; specialties: string[] }>,
+    emergency_contact_text: "For urgent pastoral care, call our 24/7 prayer line at"
+  });
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -97,82 +116,65 @@ const Contact = () => {
   };
 
   useEffect(() => {
-    const fetchPhoneNumber = async () => {
-      const { data, error } = await supabase
-        .from('footer_settings')
-        .select('phone')
-        .eq('is_active', true)
-        .single();
+    const fetchPageSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('contact_page_settings')
+          .select('*')
+          .eq('is_active', true)
+          .maybeSingle();
 
-      if (!error && data) {
-        setPhoneNumber(data.phone);
+        if (!error && data) {
+          setPageSettings({
+            ...data,
+            service_hours: data.service_hours as unknown as Array<{ day: string; times: string; service: string }>,
+            office_hours: data.office_hours as unknown as Array<{ day: string; times: string }>,
+            pastoral_staff: data.pastoral_staff as unknown as Array<{ name: string; role: string; email: string; phone: string; specialties: string[] }>
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching page settings:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchPhoneNumber();
+    fetchPageSettings();
   }, []);
 
   const contactInfo = [
     {
       icon: MapPin,
       title: "Visit Us",
-      details: ["123 Faith Street", "Hope City, HC 12345"],
+      details: [pageSettings.address_line1, pageSettings.address_line2],
       action: "Get Directions",
-      link: "https://maps.google.com"
+      link: pageSettings.maps_url
     },
     {
       icon: Phone,
       title: "Call Us",
-      details: ["Main Office: (123) 456-7890", "Prayer Line: (123) 456-7891"],
+      details: [`Main Office: ${pageSettings.main_phone}`, `Prayer Line: ${pageSettings.prayer_line_phone}`],
       action: "Call Now",
-      link: "tel:+1234567890"
+      link: `tel:${pageSettings.main_phone.replace(/[^\d+]/g, '')}`
     },
     {
       icon: Mail,
       title: "Email Us",
-      details: ["info@fpfchurch.or.ke", "pastor@fpfchurch.or.ke"],
+      details: [pageSettings.main_email, pageSettings.pastor_email],
       action: "Send Email",
-      link: "mailto:info@fpfchurch.or.ke"
+      link: `mailto:${pageSettings.main_email}`
     }
   ];
 
-  const serviceHours = [
-    { day: "Sunday", times: "9:00 AM & 11:00 AM", service: "Worship Services" },
-    { day: "Wednesday", times: "7:00 PM", service: "Bible Study" },
-    { day: "Friday", times: "7:00 PM", service: "Youth Group" },
-    { day: "Saturday", times: "10:00 AM - 2:00 PM", service: "Food Bank" }
-  ];
-
-  const officeHours = [
-    { day: "Monday - Thursday", times: "9:00 AM - 5:00 PM" },
-    { day: "Friday", times: "9:00 AM - 3:00 PM" },
-    { day: "Saturday", times: "10:00 AM - 2:00 PM" },
-    { day: "Sunday", times: "8:00 AM - 12:30 PM" }
-  ];
-
-  const pastoralStaff = [
-    {
-      name: "Pastor Michael Johnson",
-      role: "Senior Pastor",
-      email: "pastor@fpfchurch.or.ke",
-      phone: "(123) 456-7892",
-      specialties: ["Marriage Counseling", "Spiritual Guidance", "Leadership"]
-    },
-    {
-      name: "Pastor Sarah Martinez",
-      role: "Associate Pastor",
-      email: "sarah@fpfchurch.or.ke", 
-      phone: "(123) 456-7893",
-      specialties: ["Women's Ministry", "Family Counseling", "Prayer Ministry"]
-    },
-    {
-      name: "Pastor Mark Thompson",
-      role: "Youth Pastor",
-      email: "mark@fpfchurch.or.ke",
-      phone: "(123) 456-7894",
-      specialties: ["Youth Ministry", "Young Adults", "Discipleship"]
-    }
-  ];
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -180,17 +182,16 @@ const Contact = () => {
         {/* Hero Section */}
         <section className="py-20 bg-gradient-to-br from-primary to-primary/80 text-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="mb-6">Contact Us</h1>
+            <h1 className="mb-6">{pageSettings.hero_heading}</h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-              We'd love to hear from you! Whether you have questions, need prayer, 
-              or want to get involved, we're here to help.
+              {pageSettings.hero_subtitle}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" variant="secondary">
                 <a href="#contact-form">Send a Message</a>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white hover:border-white/60">
-                <a href={`tel:${phoneNumber.replace(/[^\d+]/g, '')}`}>Call {phoneNumber}</a>
+                <a href={`tel:${pageSettings.main_phone.replace(/[^\d+]/g, '')}`}>Call {pageSettings.main_phone}</a>
               </Button>
             </div>
           </div>
@@ -233,19 +234,19 @@ const Contact = () => {
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent mb-2">24 hrs</div>
+                <div className="text-2xl font-bold text-accent mb-2">{pageSettings.response_time}</div>
                 <p className="text-sm text-muted-foreground">Response Time</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent mb-2">7 days</div>
+                <div className="text-2xl font-bold text-accent mb-2">{pageSettings.days_per_week}</div>
                 <p className="text-sm text-muted-foreground">Per Week Open</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent mb-2">3</div>
+                <div className="text-2xl font-bold text-accent mb-2">{pageSettings.pastoral_staff_count}</div>
                 <p className="text-sm text-muted-foreground">Pastoral Staff</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent mb-2">500+</div>
+                <div className="text-2xl font-bold text-accent mb-2">{pageSettings.families_served}</div>
                 <p className="text-sm text-muted-foreground">Families Served</p>
               </div>
             </div>
@@ -265,7 +266,7 @@ const Contact = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {serviceHours.map((service, index) => (
+                  {pageSettings.service_hours.map((service, index) => (
                     <div key={index} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                       <div>
                         <p className="font-medium">{service.day}</p>
@@ -293,7 +294,7 @@ const Contact = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {officeHours.map((hours, index) => (
+                  {pageSettings.office_hours.map((hours, index) => (
                     <div key={index} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                       <p className="font-medium">{hours.day}</p>
                       <Badge variant="outline">
@@ -303,8 +304,7 @@ const Contact = () => {
                   ))}
                   <div className="bg-accent/10 rounded-lg p-4 mt-4">
                     <p className="text-sm text-muted-foreground">
-                      <strong>Emergency Contact:</strong> For urgent pastoral care, 
-                      call our 24/7 prayer line at (123) 456-7891
+                      <strong>Emergency Contact:</strong> {pageSettings.emergency_contact_text} {pageSettings.prayer_line_phone}
                     </p>
                   </div>
                 </CardContent>
@@ -324,7 +324,7 @@ const Contact = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {pastoralStaff.map((pastor, index) => (
+              {pageSettings.pastoral_staff.map((pastor, index) => (
                 <Card key={index}>
                   <CardContent className="p-6">
                     <div className="text-center mb-4">

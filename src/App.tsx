@@ -38,6 +38,7 @@ import AdminOutreach from "./pages/admin/Outreach";
 import AdminVolunteers from "./pages/admin/Volunteers";
 import AdminHeroSettings from "./pages/admin/HeroSettings";
 import AdminFooterSettings from "./pages/admin/FooterSettings";
+import AdminContactSettings from "./pages/admin/ContactSettings";
 import AdminFundraisingAnalytics from "./pages/admin/FundraisingAnalytics";
 import AdminAdvertisements from "./pages/admin/Advertisements";
 import AdminChurches from "./pages/admin/Churches";
@@ -71,6 +72,7 @@ const App = () => (
           <Route path="/admin/dashboard" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
           <Route path="/admin/hero-settings" element={<AdminLayout><AdminHeroSettings /></AdminLayout>} />
           <Route path="/admin/footer-settings" element={<AdminLayout><AdminFooterSettings /></AdminLayout>} />
+          <Route path="/admin/contact-settings" element={<AdminLayout><AdminContactSettings /></AdminLayout>} />
           <Route path="/admin/services" element={<AdminLayout><AdminServices /></AdminLayout>} />
           <Route path="/admin/events" element={<AdminLayout><AdminEvents /></AdminLayout>} />
           <Route path="/admin/sermons" element={<AdminLayout><AdminSermons /></AdminLayout>} />
