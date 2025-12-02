@@ -528,25 +528,26 @@ const Contact = () => {
 
             {pageSettings.church_locations.length > 0 ? (
                 <div className="space-y-8">
-                {/* Single Map with All Locations */}
-                <Card className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="aspect-video rounded-lg overflow-hidden">
-                      <iframe
-                        src={`https://maps.google.com/maps?q=${pageSettings.church_locations
-                          .map(loc => `${loc.latitude},${loc.longitude}`)
-                          .join('+')}&output=embed&z=10`}
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title="Map showing all church locations"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Single Map with Primary Location or First Location */}
+                {pageSettings.church_locations[0] && (
+                  <Card className="overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="aspect-video rounded-lg overflow-hidden">
+                        <iframe
+                          src={pageSettings.church_locations[0].map_embed_url || 
+                            `https://maps.google.com/maps?q=${pageSettings.church_locations[0].latitude},${pageSettings.church_locations[0].longitude}&z=15&output=embed`}
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          title="Church location map"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Location Cards with click to view details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
