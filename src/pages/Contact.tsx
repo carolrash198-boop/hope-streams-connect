@@ -45,7 +45,7 @@ const Contact = () => {
     service_hours: [] as Array<{ day: string; times: string; service: string }>,
     office_hours: [] as Array<{ day: string; times: string }>,
     pastoral_staff: [] as Array<{ name: string; role: string; email: string; phone: string; specialties: string[] }>,
-    church_locations: [] as Array<{ name: string; address: string; map_embed_url: string }>,
+    church_locations: [] as Array<{ name: string; address: string; latitude: number; longitude: number }>,
     emergency_contact_text: "For urgent pastoral care, call our 24/7 prayer line at"
   });
   const [formData, setFormData] = useState({
@@ -131,7 +131,7 @@ const Contact = () => {
             service_hours: data.service_hours as unknown as Array<{ day: string; times: string; service: string }>,
             office_hours: data.office_hours as unknown as Array<{ day: string; times: string }>,
             pastoral_staff: data.pastoral_staff as unknown as Array<{ name: string; role: string; email: string; phone: string; specialties: string[] }>,
-            church_locations: (data.church_locations as unknown as Array<{ name: string; address: string; map_embed_url: string }>) || []
+            church_locations: (data.church_locations as unknown as Array<{ name: string; address: string; latitude: number; longitude: number }>) || []
           });
         }
       } catch (error) {
@@ -528,48 +528,62 @@ const Contact = () => {
               <h2 className="mb-6">Our Church Locations</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 {pageSettings.church_locations.length > 0 
-                  ? `Visit any of our ${pageSettings.church_locations.length} locations. All are welcome!`
+                  ? `Visit any of our ${pageSettings.church_locations.length} location${pageSettings.church_locations.length > 1 ? 's' : ''}. All are welcome!`
                   : "Located in the heart of the community, easily accessible by car or public transportation."}
               </p>
             </div>
 
             {pageSettings.church_locations.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {pageSettings.church_locations.map((location, index) => (
-                  <Card key={index} className="overflow-hidden">
-                    <CardHeader>
-                      <CardTitle className="flex items-start gap-2">
-                        <MapPin className="h-5 w-5 mt-1 text-primary flex-shrink-0" />
-                        <div>
-                          <div className="font-semibold">{location.name}</div>
-                          <p className="text-sm text-muted-foreground font-normal mt-1">
-                            {location.address}
-                          </p>
+              <div className="space-y-8">
+                {/* Single Map with All Locations */}
+                <Card className="overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="aspect-video rounded-lg overflow-hidden">
+                      <iframe
+                        src={`https://maps.google.com/maps?q=${pageSettings.church_locations
+                          .map(loc => `${loc.latitude},${loc.longitude}`)
+                          .join('+')}&output=embed&z=10`}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Map showing all church locations"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Location List */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {pageSettings.church_locations.map((location, index) => (
+                    <Card key={index}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold mb-1">{location.name}</h3>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {location.address}
+                            </p>
+                            <Button asChild variant="outline" size="sm" className="w-full">
+                              <a 
+                                href={`https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Get Directions
+                              </a>
+                            </Button>
+                          </div>
                         </div>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {location.map_embed_url ? (
-                        <div className="aspect-video rounded-lg overflow-hidden">
-                          <iframe
-                            src={location.map_embed_url}
-                            width="100%"
-                            height="100%"
-                            style={{ border: 0 }}
-                            allowFullScreen
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            title={`Map of ${location.name}`}
-                          />
-                        </div>
-                      ) : (
-                        <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                          <p className="text-muted-foreground">Map not available</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="aspect-video bg-muted rounded-2xl flex items-center justify-center">
