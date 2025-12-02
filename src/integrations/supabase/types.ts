@@ -404,6 +404,81 @@ export type Database = {
           },
         ]
       }
+      contact_page_settings: {
+        Row: {
+          address_line1: string
+          address_line2: string
+          created_at: string | null
+          created_by: string | null
+          days_per_week: string
+          emergency_contact_text: string
+          families_served: string
+          hero_heading: string
+          hero_subtitle: string
+          id: string
+          is_active: boolean | null
+          main_email: string
+          main_phone: string
+          maps_url: string | null
+          office_hours: Json
+          pastor_email: string
+          pastoral_staff: Json
+          pastoral_staff_count: string
+          prayer_line_phone: string
+          response_time: string
+          service_hours: Json
+          updated_at: string | null
+        }
+        Insert: {
+          address_line1?: string
+          address_line2?: string
+          created_at?: string | null
+          created_by?: string | null
+          days_per_week?: string
+          emergency_contact_text?: string
+          families_served?: string
+          hero_heading?: string
+          hero_subtitle?: string
+          id?: string
+          is_active?: boolean | null
+          main_email?: string
+          main_phone?: string
+          maps_url?: string | null
+          office_hours?: Json
+          pastor_email?: string
+          pastoral_staff?: Json
+          pastoral_staff_count?: string
+          prayer_line_phone?: string
+          response_time?: string
+          service_hours?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          address_line1?: string
+          address_line2?: string
+          created_at?: string | null
+          created_by?: string | null
+          days_per_week?: string
+          emergency_contact_text?: string
+          families_served?: string
+          hero_heading?: string
+          hero_subtitle?: string
+          id?: string
+          is_active?: boolean | null
+          main_email?: string
+          main_phone?: string
+          maps_url?: string | null
+          office_hours?: Json
+          pastor_email?: string
+          pastoral_staff?: Json
+          pastoral_staff_count?: string
+          prayer_line_phone?: string
+          response_time?: string
+          service_hours?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string | null
