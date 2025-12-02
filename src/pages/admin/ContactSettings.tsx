@@ -32,7 +32,8 @@ interface PastoralStaff {
 interface ChurchLocation {
   name: string;
   address: string;
-  map_embed_url: string;
+  latitude: number;
+  longitude: number;
 }
 
 interface ContactPageSettings {
@@ -64,7 +65,7 @@ const ContactSettingsPage = () => {
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<ContactPageSettings>({
     hero_heading: "Contact Us",
-    hero_subtitle: "We'd love to hear from you! Whether you have questions, need prayer, or want to get involved, we're here to help.",
+    hero_subtitle: "We'd love to hear from you!",
     address_line1: "123 Faith Street",
     address_line2: "Hope City, HC 12345",
     main_phone: "(123) 456-7890",
@@ -76,11 +77,11 @@ const ContactSettingsPage = () => {
     days_per_week: "7 days",
     pastoral_staff_count: "3",
     families_served: "500+",
+    emergency_contact_text: "For urgent pastoral care, call our 24/7 prayer line at",
     service_hours: [],
     office_hours: [],
     pastoral_staff: [],
     church_locations: [],
-    emergency_contact_text: "For urgent pastoral care, call our 24/7 prayer line at",
     is_active: true
   });
 
@@ -249,7 +250,8 @@ const ContactSettingsPage = () => {
       church_locations: [...prev.church_locations, { 
         name: "", 
         address: "", 
-        map_embed_url: "" 
+        latitude: 0,
+        longitude: 0
       }]
     }));
   };
@@ -261,7 +263,7 @@ const ContactSettingsPage = () => {
     }));
   };
 
-  const updateChurchLocation = (index: number, field: keyof ChurchLocation, value: string) => {
+  const updateChurchLocation = (index: number, field: keyof ChurchLocation, value: string | number) => {
     setSettings(prev => ({
       ...prev,
       church_locations: prev.church_locations.map((item, i) => 
@@ -636,33 +638,50 @@ const ContactSettingsPage = () => {
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Church Name</Label>
-                        <Input
-                          placeholder="e.g., Main Church - Baringo"
-                          value={location.name}
-                          onChange={(e) => updateChurchLocation(index, 'name', e.target.value)}
-                        />
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Church Name</Label>
+                          <Input
+                            placeholder="e.g., Main Church - Baringo"
+                            value={location.name}
+                            onChange={(e) => updateChurchLocation(index, 'name', e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Address</Label>
+                          <Input
+                            placeholder="e.g., 123 Faith Street, Baringo"
+                            value={location.address}
+                            onChange={(e) => updateChurchLocation(index, 'address', e.target.value)}
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label>Address</Label>
-                        <Input
-                          placeholder="e.g., 123 Faith Street, Baringo"
-                          value={location.address}
-                          onChange={(e) => updateChurchLocation(index, 'address', e.target.value)}
-                        />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Latitude</Label>
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="e.g., 0.4636"
+                            value={location.latitude}
+                            onChange={(e) => updateChurchLocation(index, 'latitude', parseFloat(e.target.value) || 0)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Longitude</Label>
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="e.g., 36.0617"
+                            value={location.longitude}
+                            onChange={(e) => updateChurchLocation(index, 'longitude', parseFloat(e.target.value) || 0)}
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-2 col-span-2">
-                        <Label>Google Maps Embed URL</Label>
-                        <Textarea
-                          placeholder='Paste the Google Maps embed iframe src URL here (e.g., https://www.google.com/maps/embed?pb=...)'
-                          value={location.map_embed_url}
-                          onChange={(e) => updateChurchLocation(index, 'map_embed_url', e.target.value)}
-                          rows={3}
-                        />
-                        <p className="text-sm text-muted-foreground">
-                          Get this from Google Maps → Share → Embed a map → Copy the src URL from the iframe
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground">
+                          <strong>How to find coordinates:</strong> Open Google Maps → Right-click on your church location → Click the coordinates at the top to copy them
                         </p>
                       </div>
                     </div>
